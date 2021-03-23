@@ -1,0 +1,11 @@
+**/.git
+**/tmp
+**/node_modules
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+packages/server/dist
+**/.env

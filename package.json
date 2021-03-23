@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "personal-gallery",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "server-dev": "yarn workspace server dev",
+    "web-dev": "yarn workspace web start",
+    "start-dev": "run-p server-dev web-dev",
+    "web-build": "yarn workspace web build",
+    "copy": "yarn copyfiles -u 3 \"packages/web/build/*\" \"packages/web/build/**/*\" packages/server/public",
+    "build": "yarn web-build && yarn workspace server build && yarn copy",
+    "build-dev": "NODE_ENV=development yarn web-build && yarn workspace server build && yarn copy",
+    "start": "yarn workspace server start"
+  },
+  "author": {
+    "name": "Maksim Karasev"
+  },
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "installConfig": {
+    "hoistingLimits": "dependencies"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "npm-run-all": "^4.1.5"
+  }
+}
