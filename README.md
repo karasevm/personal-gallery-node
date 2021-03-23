@@ -84,4 +84,4 @@ Easies way to contribute is to submit a translation, use `./packages/web/public/
 as a template and submit a pull request with your language.
 
 ## License
-[MIT](LICENSE.md)
+[MIT](LICENSE)
