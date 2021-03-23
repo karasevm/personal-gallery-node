@@ -39,16 +39,15 @@ Sharing on mobile is easier than ever thanks to the PWA Share Target APIs.
 The image is available on dockerhub, you can start with an example 
 docker-compose below:
 ````yaml
-version: "3.9"
+version: "3"
 services:
   gallery:
-    image: PLACEHOLDER
+    image: karasevm/personal-gallery-node
     ports: 
       - 80:80
     volumes:
       - ./data:/images
       - ./db:/db
-
 ````
 **Environment Variables**
 
