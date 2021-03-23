@@ -14,9 +14,11 @@ const clearTempDir = () => {
   fs.readdir(directory, (err, files) => {
     if (err) throw err;
     files.forEach((file) => {
-      fs.unlink(path.join(directory, file), (e) => {
-        if (e) throw e;
-      });
+      if (!file.startsWith('.')) {
+        fs.unlink(path.join(directory, file), (e) => {
+          if (e) throw e;
+        });
+      }
     });
   });
 };
@@ -24,20 +26,17 @@ const clearTempDir = () => {
 const getFileFromTempDir = (fullPath = false) => {
   const directory = path.join(process.cwd(), 'test', 'i');
   const files = fs.readdirSync(directory);
-  return fullPath ? path.join(directory, files[0]) : files[0];
+  return fullPath ? path.join(directory, files[1]) : files[1];
 };
-
-beforeAll(async () => {
-  clearTempDir();
-  database.db.exec('DELETE FROM sessions');
-  database.db.exec('DELETE FROM meta');
-  database.db.exec('DELETE FROM images');
-  await register('testing', 'testing');
-});
 
 describe('Logged in', () => {
   const api = supertest.agent(app);
   beforeAll(async () => {
+    clearTempDir();
+    database.db.exec('DELETE FROM sessions');
+    database.db.exec('DELETE FROM meta');
+    database.db.exec('DELETE FROM images');
+    await register('testing', 'testing');
     await api
       .post(`${API_URL}/login`)
       .send({ username: 'testing', password: 'testing' });
