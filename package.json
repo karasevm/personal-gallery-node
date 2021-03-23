@@ -11,7 +11,8 @@
     "copy": "yarn copyfiles -u 3 \"packages/web/build/*\" \"packages/web/build/**/*\" packages/server/public",
     "build": "yarn web-build && yarn workspace server build && yarn copy",
     "build-dev": "NODE_ENV=development yarn web-build && yarn workspace server build && yarn copy",
-    "start": "yarn workspace server start"
+    "start": "yarn workspace server start",
+    "test": "yarn workspace server test"
   },
   "author": {
     "name": "Maksim Karasev"
