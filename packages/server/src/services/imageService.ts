@@ -15,38 +15,42 @@ const nanoid = customAlphabet(alphabet, 7);
  * Reads all files in the directory and tries to add them to the database.
  */
 export const registerFileInFolder = async () => {
-  const files = fs.readdirSync(IMAGE_DIR);
-  const filesWithStats = await Promise.all(
-    files.map((filename) => fs.promises
-      .stat(path.join(IMAGE_DIR, filename))
-      .then((stat) => ({ filename, stat }))),
-  );
-
-  const filteredFilesWithStats:{
-    filename: string;
-    stat: fs.Stats;
-  }[] = [];
-
-  const filePromises = filesWithStats.map(async (file) => {
-    const result = await fileType.fromFile(
-      path.join(IMAGE_DIR, file.filename),
+  try {
+    const files = fs.readdirSync(IMAGE_DIR);
+    const filesWithStats = await Promise.all(
+      files.map((filename) => fs.promises
+        .stat(path.join(IMAGE_DIR, filename))
+        .then((stat) => ({ filename, stat }))),
     );
-    if (result !== undefined && ACCEPTED_MIME.includes(result.mime)) {
-      filteredFilesWithStats.push(file);
-    }
-  });
-  await Promise.all(filePromises);
-  let newCount = 0;
-  filteredFilesWithStats.forEach((file) => {
-    try {
-      insertImageIntoDB(file.filename, file.stat.mtime.getTime());
-      newCount += 1;
-    } catch (e) { logger.error(`${e.name}: ${e.message}`); }
-  });
 
-  logger.info(
-    `Found ${filesWithStats.length} files, ${filteredFilesWithStats.length} valid images, ${newCount} new`,
-  );
+    const filteredFilesWithStats:{
+      filename: string;
+      stat: fs.Stats;
+    }[] = [];
+
+    const filePromises = filesWithStats.map(async (file) => {
+      const result = await fileType.fromFile(
+        path.join(IMAGE_DIR, file.filename),
+      );
+      if (result !== undefined && ACCEPTED_MIME.includes(result.mime)) {
+        filteredFilesWithStats.push(file);
+      }
+    });
+    await Promise.all(filePromises);
+    let newCount = 0;
+    filteredFilesWithStats.forEach((file) => {
+      try {
+        insertImageIntoDB(file.filename, file.stat.mtime.getTime());
+        newCount += 1;
+      } catch (e) { logger.error(`${e.name}: ${e.message}`); }
+    });
+
+    logger.info(
+      `Found ${filesWithStats.length} files, ${filteredFilesWithStats.length} valid images, ${newCount} new`,
+    );
+  } catch (e) {
+    logger.error(`Error while registering files ${e.message}`);
+  }
 };
 
 /**

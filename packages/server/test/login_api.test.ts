@@ -5,29 +5,29 @@ import * as database from '../src/utils/db';
 
 const api = supertest(app);
 const API_URL = '/api';
+beforeAll(() => {
+  database.db.exec('DELETE FROM sessions');
+  database.db.exec('DELETE FROM meta');
+  database.db.exec('DELETE FROM images');
+});
 describe('Login API', () => {
+  test('meta status correct', (done) => {
+    api
+      .get(`${API_URL}/meta`)
+      .expect(200)
+      .end((err, res) => {
+        if (typeof err !== 'undefined') {
+          done(err);
+        }
+        try {
+          expect(res.body.setupFinished).toBe(false);
+          done();
+        } catch (error) {
+          done(error);
+        }
+      });
+  });
   describe('Registration', () => {
-    beforeAll(() => {
-      database.db.exec('DELETE FROM sessions');
-      database.db.exec('DELETE FROM meta');
-      database.db.exec('DELETE FROM images');
-    });
-    test('meta status correct', (done) => {
-      api
-        .get(`${API_URL}/meta`)
-        .expect(200)
-        .end((err, res) => {
-          if (typeof err !== 'undefined') {
-            done(err);
-          }
-          try {
-            expect(res.body.setupFinished).toBe(false);
-            done();
-          } catch (error) {
-            done(error);
-          }
-        });
-    });
     test('400 on registering with empty username', () => {
       return api
         .post(`${API_URL}/login/register`)

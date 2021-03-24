@@ -11,15 +11,11 @@ const API_URL = '/api';
 
 const clearTempDir = () => {
   const directory = path.join(process.cwd(), 'test', 'i');
-  fs.readdir(directory, (err, files) => {
-    if (err) throw err;
-    files.forEach((file) => {
-      if (!file.startsWith('.')) {
-        fs.unlink(path.join(directory, file), (e) => {
-          if (e) throw e;
-        });
-      }
-    });
+  const files = fs.readdirSync(directory);
+  files.forEach((file) => {
+    if (!file.startsWith('.')) {
+      fs.unlinkSync(path.join(directory, file));
+    }
   });
 };
 
@@ -29,13 +25,16 @@ const getFileFromTempDir = (fullPath = false) => {
   return fullPath ? path.join(directory, files[1]) : files[1];
 };
 
+beforeAll(async (done) => {
+  clearTempDir();
+  database.db.prepare('DELETE FROM sessions').run();
+  database.db.prepare('DELETE FROM meta').run();
+  database.db.prepare('DELETE FROM images').run();
+  done();
+}, 30000);
 describe('Logged in', () => {
   const api = supertest.agent(app);
   beforeAll(async () => {
-    clearTempDir();
-    database.db.exec('DELETE FROM sessions');
-    database.db.exec('DELETE FROM meta');
-    database.db.exec('DELETE FROM images');
     await register('testing', 'testing');
     await api
       .post(`${API_URL}/login`)
@@ -183,11 +182,4 @@ describe('Not logged in', () => {
       });
     });
   });
-});
-
-afterAll(() => {
-  clearTempDir();
-  database.db.exec('DELETE FROM sessions');
-  database.db.exec('DELETE FROM meta');
-  database.db.exec('DELETE FROM images');
 });
