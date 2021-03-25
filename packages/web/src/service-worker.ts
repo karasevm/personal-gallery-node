@@ -91,9 +91,11 @@ registerRoute(
 class MyStrategy extends Strategy {
   // eslint-disable-next-line class-methods-use-this
   async _handle(request: any, handler: { fetch: (arg0: any) => any; }) {
-    await handler.fetch(request);
-    return Response.redirect('/', 302);
-    // return handler.fetch(request);
+    if (request.mode === 'navigate') {
+      await handler.fetch(request);
+      return Response.redirect('/', 302);
+    }
+    return handler.fetch(request);
   }
 }
 
