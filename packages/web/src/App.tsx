@@ -261,7 +261,7 @@ function App(props: WithWidth) {
       setNotification(t('API token copied to clipboard'));
       setApiKey(key);
     } catch (e) {
-      console.error(e);
+      setNotification(t('Error getting API key'));
     }
   };
 
