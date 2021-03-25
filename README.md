@@ -1,4 +1,7 @@
 # Personal image gallery
+[![Run tests](https://github.com/karasevm/personal-gallery-node/actions/workflows/test.yml/badge.svg)](https://github.com/karasevm/personal-gallery-node/actions/workflows/test.yml)
+[![Docker CI](https://github.com/karasevm/personal-gallery-node/actions/workflows/publish.yml/badge.svg)](https://github.com/karasevm/personal-gallery-node/actions/workflows/publish.yml)
+
 A simple to use, modern place to store your images. Perfect for storing large 
 amounts of screenshots and screen recordings. 
 
