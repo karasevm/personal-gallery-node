@@ -24,7 +24,7 @@ export const doLogin = async (
     );
     return status;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return e.response.status || 500;
   }
 };
@@ -46,16 +46,15 @@ export const doRegister = async (
     );
     return status;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return e.response.status || 500;
   }
 };
 
 export const doLogout = async () => {
   try {
-    const result = await axios.post(`${API_BASE_URL}/login/logout`);
-    console.log(result.data);
+    await axios.post(`${API_BASE_URL}/login/logout`);
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };

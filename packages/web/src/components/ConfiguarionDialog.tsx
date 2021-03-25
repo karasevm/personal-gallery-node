@@ -71,7 +71,6 @@ const ConfigurationDialog = ({
   };
   const downloadSharexConfig = () => {
     if (typeof apiKey === 'undefined') {
-      console.log('This should never happen');
       return;
     }
     const configText = generateConfig(
@@ -92,7 +91,6 @@ const ConfigurationDialog = ({
     element.click();
     document.body.removeChild(element);
   };
-  console.log();
   return (
     <Dialog onClose={onDialogClose} open={open} aria-labelledby="dialog-title">
       <DialogTitle id="dialog-title">{t('Settings')}</DialogTitle>
