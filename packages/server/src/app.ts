@@ -18,8 +18,8 @@ import * as config from './utils/config';
 import { isNonEmptyString } from './utils/misc';
 
 const app = express();
-app.use(cors());
 if (process.env.NODE_ENV === 'dev') {
+  app.use(cors());
   app.use(morgan('dev'));
 } else {
   app.use(morgan('combined'));
