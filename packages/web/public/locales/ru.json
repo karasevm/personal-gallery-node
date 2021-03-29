@@ -38,5 +38,6 @@
   "Check your old password and try again": "Проверьте ваш старый пароль и попробуйте снова",
   "At least one field must be filled": "Как минимум одно поле должно быть заполнено",
   "Get new API key?": "Получить новый API ключ?",
-  "This will invalidate your previous API key, continue?": "Ваш предыдущий API ключ станет недействительным, продолжить?"
+  "This will invalidate your previous API key, continue?": "Ваш предыдущий API ключ станет недействительным, продолжить?",
+  "Error getting API key": "Ошибка получения API ключа"
 }

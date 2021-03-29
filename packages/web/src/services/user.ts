@@ -14,7 +14,6 @@ export const updateCredentials = async (
   username: string,
   password: string,
 ) => {
-  console.log('username:', username, ' password:', password);
   const { data } = await axios.post(
     `${API_BASE_URL}/user/updateCredentials`,
     {

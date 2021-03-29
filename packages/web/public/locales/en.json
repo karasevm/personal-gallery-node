@@ -38,5 +38,6 @@
   "Check your old password and try again": "Check your old password and try again",
   "At least one field must be filled": "At least one field must be filled",
   "Get new API key?": "Get new API key?",
-  "This will invalidate your previous API key, continue?": "This will invalidate your previous API key, continue?"
+  "This will invalidate your previous API key, continue?": "This will invalidate your previous API key, continue?",
+  "Error getting API key":"Error getting API key"
 }

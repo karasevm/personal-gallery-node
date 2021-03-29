@@ -12,7 +12,5 @@ export const getMeta = async (): Promise<Meta> => {
   ) {
     return { accepted: data.accepted, setupFinished: data.setupFinished };
   }
-  console.log('truth:', Object.prototype.toString.call(data.accepted));
-  console.log(data.setupFinished);
   throw new Error('Malformed server response');
 };

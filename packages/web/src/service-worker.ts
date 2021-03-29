@@ -22,7 +22,6 @@ clientsClaim();
 // Their URLs are injected into the manifest variable below.
 // This variable must be present somewhere in your service worker file,
 // even if you decide not to use precaching. See https://cra.link/PWA
-console.log('wbcache', self.__WB_MANIFEST);
 precacheAndRoute(self.__WB_MANIFEST);
 
 // Set up App Shell-style routing, so that all navigation requests
@@ -91,9 +90,11 @@ registerRoute(
 class MyStrategy extends Strategy {
   // eslint-disable-next-line class-methods-use-this
   async _handle(request: any, handler: { fetch: (arg0: any) => any; }) {
-    await handler.fetch(request);
-    return Response.redirect('/', 302);
-    // return handler.fetch(request);
+    if (request.mode === 'navigate') {
+      await handler.fetch(request);
+      return Response.redirect('/', 302);
+    }
+    return handler.fetch(request);
   }
 }
 

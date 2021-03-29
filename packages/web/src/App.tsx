@@ -210,10 +210,8 @@ function App(props: WithWidth) {
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
-    console.log(e.clipboardData);
     if (e.clipboardData.items.length !== 0) {
       Array.from(e.clipboardData.items).forEach((item) => {
-        console.log(item);
         if (acceptedUploadFiletypes.includes(item.type)) {
           const pasteAsFile = item.getAsFile();
           if (pasteAsFile !== null) {
@@ -262,9 +260,8 @@ function App(props: WithWidth) {
       await navigator.clipboard.writeText(key);
       setNotification(t('API token copied to clipboard'));
       setApiKey(key);
-      console.log(key);
     } catch (e) {
-      console.log(e);
+      setNotification(t('Error getting API key'));
     }
   };
 
@@ -284,7 +281,6 @@ function App(props: WithWidth) {
     }
   };
 
-  console.log('current settings:', userSettings);
   if (userSettings === undefined || userLoggedIn === undefined) {
     return (
       <Grid container justify="center">
@@ -292,7 +288,6 @@ function App(props: WithWidth) {
       </Grid>
     );
   }
-  console.log('Images data:', imagesData);
   return (
     <div
       className={classes.root}
