@@ -41,7 +41,7 @@ Sharing on mobile is easier than ever thanks to the PWA Share Target APIs.
 ### Docker (Reccommended)
 The image is available on dockerhub, you can start with an example 
 docker-compose below:
-````yaml
+```yaml
 version: "3"
 services:
   gallery:
@@ -51,7 +51,7 @@ services:
     volumes:
       - ./data:/images
       - ./db:/db
-````
+```
 **Environment Variables**
 
 All docker environment variables are optional
@@ -82,7 +82,7 @@ Clone the repo, set the server environment with .env, install dependencies, star
 REST API documentation is available [here](packages/server/docs/api/README.md)
 
 ## Contributing
-Easies way to contribute is to submit a translation, use `./packages/web/public/locales/en.json` 
+Easiest way to contribute is to submit a translation, use `./packages/web/public/locales/en.json` 
 as a template and submit a pull request with your language.
 
 ## License
