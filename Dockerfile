@@ -4,8 +4,7 @@ WORKDIR /app
 
 COPY ./ /app
 
-RUN yarn plugin import workspace-tools \
-  && yarn workspaces focus web \
+RUN  yarn workspaces focus web \
   && yarn workspace web build
 
 FROM node:lts-alpine
@@ -20,7 +19,6 @@ RUN apk add --update-cache \
   python3 \
   build-base \
   && yarn --version\
-  && yarn plugin import workspace-tools \
   && yarn workspaces focus server\
   && yarn workspace server build \
   && yarn cache clean --all\
