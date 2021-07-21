@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import fileUpload from 'express-fileupload';
+import fileType from 'file-type';
 import thumbnailsRouter from './routes/thumbnails';
 import imagesRouter from './routes/images';
 import metaRouter from './routes/meta';
@@ -46,8 +47,15 @@ app.use('/api/login', rateLimiter, loginRouter);
 app.use('/api/user', requireAuth, userRouter);
 app.get('/:id', async (req, res) => {
   try {
-    const result = (await getImage(req.params.id)).imagebuffer;
-    res.end(result, 'binary');
+    const buffer = (await getImage(req.params.id)).imagebuffer;
+    const imageType = await fileType.fromBuffer(buffer);
+    if (imageType === undefined) {
+      res.redirect('/');
+      return;
+    }
+    const { mime } = imageType;
+    res.type(mime);
+    res.end(buffer, 'binary');
   } catch (err) {
     res.redirect('/');
   }
