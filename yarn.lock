@@ -8240,7 +8240,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"file-type@npm:*, file-type@npm:^16.1.0":
+"file-type@npm:*":
   version: 16.2.0
   resolution: "file-type@npm:16.2.0"
   dependencies:
@@ -8249,6 +8249,17 @@ __metadata:
     token-types: ^2.0.0
     typedarray-to-buffer: ^3.1.5
   checksum: 42018f24174301e3a539fa0b5b0ef466dc484952a0823102006e387103cde61d2282f15e258a051be15379301f3fa6d6c1cdd20bf4af1d24f0f417553d4bdaef
+  languageName: node
+  linkType: hard
+
+"file-type@npm:^16.5.0":
+  version: 16.5.2
+  resolution: "file-type@npm:16.5.2"
+  dependencies:
+    readable-web-to-node-stream: ^3.0.0
+    strtok3: 6.1.3
+    token-types: ^3.0.0
+  checksum: 93f776843f5aa9ae4fcaa4c6d555836349abed724238ae13d28053c0d4793ac36433c9c483d9968986af77535a3e3e0aad0c4be811728e7ec1848196f96c413d
   languageName: node
   linkType: hard
 
@@ -12847,6 +12858,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"peek-readable@npm:^3.1.4":
+  version: 3.1.4
+  resolution: "peek-readable@npm:3.1.4"
+  checksum: fe774e720ab8ae969186535e959f9d5b2c0ee46f12b89f8272fd7447d85f65fa5302de8f8bce54666f452c4ba4ee143f3d4a9d541c7be61c87d32cb6cbfcdfba
+  languageName: node
+  linkType: hard
+
 "performance-now@npm:^2.1.0":
   version: 2.1.0
   resolution: "performance-now@npm:2.1.0"
@@ -15415,7 +15433,7 @@ resolve@1.18.1:
     express: ^4.17.1
     express-fileupload: ^1.2.1
     express-rate-limit: ^5.2.6
-    file-type: ^16.1.0
+    file-type: ^16.5.0
     fluent-ffmpeg: ^2.1.2
     jest: ^26.6.3
     morgan: ^1.10.0
@@ -16264,6 +16282,16 @@ resolve@1.18.1:
   languageName: node
   linkType: hard
 
+"strtok3@npm:6.1.3":
+  version: 6.1.3
+  resolution: "strtok3@npm:6.1.3"
+  dependencies:
+    "@tokenizer/token": ^0.1.1
+    peek-readable: ^3.1.4
+  checksum: 5026b36b67f18c84b62fd209861205b8432a205acb2984569d84938e1bcfc1ac328f104ad9474c61384d36f8a27240c62dbd0b716423db36909cdae323e78d20
+  languageName: node
+  linkType: hard
+
 "strtok3@npm:^6.0.3":
   version: 6.0.8
   resolution: "strtok3@npm:6.0.8"
@@ -16714,6 +16742,16 @@ resolve@1.18.1:
     "@tokenizer/token": ^0.1.1
     ieee754: ^1.2.1
   checksum: e5874d0a5055e10f292585aabaf76a4c4c2833d9f252d0317c33256121b3bbcf9ae2d951e08f85484fb6485070a37edd14c750ba7d4255664c9962c7f6205265
+  languageName: node
+  linkType: hard
+
+"token-types@npm:^3.0.0":
+  version: 3.1.0
+  resolution: "token-types@npm:3.1.0"
+  dependencies:
+    "@tokenizer/token": ^0.1.1
+    ieee754: ^1.2.1
+  checksum: 7130355c511a398b5c246313cc8b9220c235b3eb5d597c0ebb9188aaaed2afe88a752228af06913fa6e0a5d23656c33d1401a141923d300c2965db0056cba8a4
   languageName: node
   linkType: hard
 
