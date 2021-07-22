@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import fileType from 'file-type';
 import logger from '../utils/logger';
 import { imageExists } from '../services/imageService';
 import { thumbnailCache } from '../utils/cache';
@@ -19,11 +20,24 @@ thumbnailsRouter.get('/:image/:type', async (req, res) => {
     // so we manually check how we should treat the result
     if (result instanceof Buffer) {
       res.set('Cache-Control', 'private, max-age=2592000');
+      const imageType = await fileType.fromBuffer(result);
+      if (imageType === undefined) {
+        throw new Error('file-type error');
+      }
+      const { mime } = imageType;
+      res.type(mime);
       res.end(result, 'binary');
     } else if (result?.type === 'Buffer') {
       // hack for handling object returned from redis
       res.set('Cache-Control', 'private, max-age=2592000');
-      res.end(Buffer.from(result.data), 'binary');
+      const data = Buffer.from(result.data);
+      const imageType = await fileType.fromBuffer(data);
+      if (imageType === undefined) {
+        throw new Error('file-type error');
+      }
+      const { mime } = imageType;
+      res.type(mime);
+      res.end(data, 'binary');
     } else {
       throw new Error('Unknow object type');
     }

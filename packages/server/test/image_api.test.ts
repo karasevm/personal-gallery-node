@@ -97,7 +97,7 @@ describe('Logged in', () => {
               done(err);
             }
             try {
-              expect(await fileType.fromBuffer(Buffer.from(res.text))).toBe('image/jpeg');
+              expect(await fileType.fromBuffer(res.body)).toBe('image/jpeg');
               done();
             } catch (e) {
               done(e);
@@ -113,7 +113,7 @@ describe('Logged in', () => {
               done(err);
             }
             try {
-              expect(await fileType.fromBuffer(Buffer.from(res.text))).toBe('image/webp');
+              expect(await fileType.fromBuffer(res.body)).toBe('image/webp');
               done();
             } catch (e) {
               done(e);
@@ -168,7 +168,7 @@ describe('Not logged in', () => {
               done(err);
             }
             try {
-              expect(await fileType.fromBuffer(Buffer.from(res.text))).toBe('image/jpeg');
+              expect(await fileType.fromBuffer(res.body)).toBe('image/jpeg');
               done();
             } catch (e) {
               done(e);
