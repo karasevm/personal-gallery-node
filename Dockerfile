@@ -15,7 +15,7 @@ COPY ./ /app
 
 COPY --from=frontend-build /app/packages/web/build /app/packages/server/public
 RUN apt update && \
-  apt install \
+  apt install -y \
   ffmpeg \
   python3 \
   build-essential \
