@@ -14,7 +14,8 @@ WORKDIR /app
 COPY ./ /app
 
 COPY --from=frontend-build /app/packages/web/build /app/packages/server/public
-RUN apt install \
+RUN apt update && \
+  apt install \
   ffmpeg \
   python3 \
   build-essential \
