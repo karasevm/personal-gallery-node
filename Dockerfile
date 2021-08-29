@@ -7,7 +7,7 @@ COPY ./ /app
 RUN  yarn workspaces focus web \
   && yarn workspace web build
 
-FROM node:lts-alpine
+FROM node:lts-bullseye
 
 WORKDIR /app
 
