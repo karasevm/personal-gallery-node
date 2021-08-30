@@ -18,7 +18,9 @@ RUN apt-get update && \
   apt-get install -y \
   ffmpeg \
   python3 \
+  libjemalloc-dev \
   build-essential \
+  && find /usr/ -name "*jemalloc.so" > /etc/ld.so.preload \
   && yarn --version\
   && yarn workspaces focus server\
   && yarn workspace server build \
