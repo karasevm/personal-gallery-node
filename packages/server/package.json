@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "_prestart": "yarn build",
-    "start": "NODE_ENV=production node dist/src/server.js",
+    "start": "NODE_ENV=production node --max-old-space-size=256 dist/src/server.js",
     "dev": "NODE_ENV=dev ts-node-dev src/server.ts",
     "test": "NODE_ENV=test jest --verbose --runInBand --rootDir=test",
     "lint": "eslint \"./src/**/*.{ts,tsx}\""
