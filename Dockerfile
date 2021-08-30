@@ -14,15 +14,16 @@ WORKDIR /app
 COPY ./ /app
 
 COPY --from=frontend-build /app/packages/web/build /app/packages/server/public
-RUN apt update && \
-  apt install -y \
+RUN apt-get update && \
+  apt-get install -y \
   ffmpeg \
   python3 \
   build-essential \
   && yarn --version\
   && yarn workspaces focus server\
   && yarn workspace server build \
-  && yarn cache clean --all
+  && yarn cache clean --all \
+  && rm -rf /var/lib/apt/lists/*
 
 VOLUME ["/images", "/db"]
 ENV IMAGE_DIR="/images"
