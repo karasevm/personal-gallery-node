@@ -20,12 +20,12 @@ RUN apt-get update && \
   python3 \
   libjemalloc-dev \
   build-essential \
-  && find /usr/ -name "*jemalloc.so" > /etc/ld.so.preload \
   && yarn --version\
   && yarn workspaces focus server\
   && yarn workspace server build \
   && yarn cache clean --all \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && find /usr/ -name "*jemalloc.so" > /etc/ld.so.preload 
 
 VOLUME ["/images", "/db"]
 ENV IMAGE_DIR="/images"
