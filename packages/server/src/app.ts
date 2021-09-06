@@ -37,8 +37,8 @@ const rateLimiter = rateLimit({
 });
 const speedLimiter = slowDown({
   windowMs: 60 * 1000, // 15 minutes
-  delayAfter: 5, // allow 100 requests per 15 minutes, then...
-  delayMs: 300, // begin adding 500ms of delay per request above 100:
+  delayAfter: 2, // allow 100 requests per 15 minutes, then...
+  delayMs: 100, // begin adding 500ms of delay per request above 100:
 });
 
 app.use(express.json());
