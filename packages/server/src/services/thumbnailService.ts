@@ -72,7 +72,7 @@ export const getThumbnail = async (
       );
       imagebuffer = await readFilePromise(`${tmpDir.name}/temp.png`);
       await unlinkFilePromise(`${tmpDir.name}/temp.png`);
-    } catch (e) {
+    } catch (e: any) {
       logger.error(`${e.name}:${e.message}`);
     }
     tmpDir.removeCallback();

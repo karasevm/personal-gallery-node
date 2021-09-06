@@ -274,7 +274,7 @@ function App(props: WithWidth) {
       await userService.updateCredentials(oldPassword, username, password);
       handleLogout();
       setNotification(t('Please login with your new credentials'));
-    } catch (e) {
+    } catch (e: any) {
       if (e.response.status === 401) {
         setNotification(t('Check your old password and try again'));
       }

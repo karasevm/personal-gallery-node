@@ -23,7 +23,7 @@ export const doLogin = async (
       },
     );
     return status;
-  } catch (e) {
+  } catch (e: any) {
     console.error(e);
     return e.response.status || 500;
   }
@@ -45,7 +45,7 @@ export const doRegister = async (
       },
     );
     return status;
-  } catch (e) {
+  } catch (e: any) {
     console.error(e);
     return e.response.status || 500;
   }

@@ -42,13 +42,13 @@ export const registerFileInFolder = async () => {
       try {
         insertImageIntoDB(file.filename, file.stat.mtime.getTime());
         newCount += 1;
-      } catch (e) { logger.error(`${e.name}: ${e.message}`); }
+      } catch (e: any) { logger.error(`${e.name}: ${e.message}`); }
     });
 
     logger.info(
       `Found ${filesWithStats.length} files, ${filteredFilesWithStats.length} valid images, ${newCount} new`,
     );
-  } catch (e) {
+  } catch (e: any) {
     logger.error(`Error while registering files ${e.message}`);
   }
 };

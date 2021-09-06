@@ -15,7 +15,7 @@ export const validateCredentials = async (
   try {
     return (await bcrypt.compare(password, db.getMeta('password')))
     && username === db.getMeta('username');
-  } catch (e) {
+  } catch (e:any) {
     logger.error(`validateCredentials: ${e.message}`);
     return false;
   }

@@ -87,7 +87,7 @@ imagesRouter.get('/', async (req, res) => {
 });
 
 // Image upload
-imagesRouter.post('/', async (req, res) => {
+imagesRouter.post('/', async (req:any, res) => {
   if (req.files === undefined) {
     res.status(400).json({ status: 'error', error: 'File missing.' });
   } else if (Array.isArray(req.files.file)) {
