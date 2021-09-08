@@ -3,7 +3,6 @@ import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
-import slowDown from 'express-slow-down';
 import fileUpload from 'express-fileupload';
 import fileType from 'file-type';
 import thumbnailsRouter from './routes/thumbnails';
@@ -35,11 +34,11 @@ const rateLimiter = rateLimit({
   },
   onLimitReached: (req) => logger.warn(`${req.ip} hit rate limit`),
 });
-const speedLimiter = slowDown({
-  windowMs: 60 * 1000, // 15 minutes
-  delayAfter: 2, // allow 100 requests per 15 minutes, then...
-  delayMs: 100, // begin adding 500ms of delay per request above 100:
-});
+// const speedLimiter = slowDown({
+//   windowMs: 60 * 1000, // 15 minutes
+//   delayAfter: 2, // allow 100 requests per 15 minutes, then...
+//   delayMs: 100, // begin adding 500ms of delay per request above 100:
+// });
 
 app.use(express.json());
 app.use(cookieParser());
@@ -48,7 +47,7 @@ app.set('trust proxy', config.PROXY);
 
 app.use(express.static('public'));
 app.use('/api/images', requireAuth, fileUpload(), imagesRouter);
-app.use('/api/thumbnails', requireAuth, speedLimiter, thumbnailsRouter);
+app.use('/api/thumbnails', requireAuth, thumbnailsRouter);
 app.use('/api/meta', metaRouter);
 app.use('/api/login', rateLimiter, loginRouter);
 app.use('/api/user', requireAuth, userRouter);
