@@ -49,6 +49,7 @@ const ffmpegScreenshotPromise = (
 export const getThumbnail = async (
   filename: string,
   thumbnailFormat: string,
+  fullsAsThumbs: boolean,
   width: number = 210,
   height: number = 160,
 ): Promise<Buffer> => {
@@ -76,6 +77,9 @@ export const getThumbnail = async (
       logger.error(`${e.name}:${e.message}`);
     }
     tmpDir.removeCallback();
+  }
+  if (fullsAsThumbs) {
+    return imagebuffer;
   }
   // Convert the buffer into requested format
   switch (thumbnailFormat) {

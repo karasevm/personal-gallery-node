@@ -17,3 +17,4 @@ export const { REDIS_PASSWORD } = process.env;
 export const PROXY = process.env.PROXY || true;
 export const { USERNAME } = process.env;
 export const { PASSWORD } = process.env;
+export const FULLS_AS_THUMBS = process.env.FULLS_AS_THUMBS === 'true' || false;

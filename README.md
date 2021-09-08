@@ -64,6 +64,8 @@ All docker environment variables are optional
 
 `BASE_URL` - base directory if app isn't in root
 
+`FULLS_AS_THUMBS` - whether to use full size images as thumbnails (useful on slow servers with fast clients)
+
 To use Redis instead of built-it memory cache:
 
 `REDIS_HOST` - Redis host
