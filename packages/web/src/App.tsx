@@ -314,7 +314,7 @@ function App(props: WithWidth) {
             >
               {typeof imagesData === 'object' && Object.keys(imagesData).length !== 0 ? (
                 <ImageGridListTile
-                  images={[...new Set(Object.keys(imagesData).sort().reduce(
+                  images={[...new Set(Object.keys(imagesData).sort((a:any, b:any) => a - b).reduce(
                     (r, k) => (r.concat(imagesData[k])),
                     [],
                   ))]}
