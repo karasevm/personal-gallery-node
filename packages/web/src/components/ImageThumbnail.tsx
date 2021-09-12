@@ -1,4 +1,4 @@
-import { ButtonBase, GridListTileBar, IconButton } from '@material-ui/core';
+import { ButtonBase, ImageListItemBar, IconButton } from '@material-ui/core';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -92,8 +92,8 @@ const ImageThumbnail = ({ image, onTileClick, onNotification }:{
             </picture>
           </a>
         </ButtonBase>
-        <GridListTileBar
-          titlePosition="top"
+        <ImageListItemBar
+          position="top"
           actionIcon={(
             <IconButton
               className={classes.icon}

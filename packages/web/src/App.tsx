@@ -283,7 +283,7 @@ function App(props: WithWidth) {
 
   if (userSettings === undefined || userLoggedIn === undefined) {
     return (
-      <Grid container justify="center">
+      <Grid container justifyContent="center">
         <CircularProgress className={classes.loader} />
       </Grid>
     );
@@ -307,7 +307,7 @@ function App(props: WithWidth) {
               pageStart={-1}
               hasMore={hasMore}
               loader={(
-                <Grid container justify="center">
+                <Grid key="asdf" container justifyContent="center">
                   <CircularProgress className={classes.loader} />
                 </Grid>
               )}
@@ -323,7 +323,7 @@ function App(props: WithWidth) {
                   onNotification={setNotification}
                 />
               ) : (
-                <>
+                <Grid key="qwerty">
                   <div className={classes.placeholderIconContainer}>
                     <span className={`material-icons-outlined ${classes.placeholderIcon}`}>
                       insert_photo
@@ -332,7 +332,7 @@ function App(props: WithWidth) {
                   <Typography className={classes.placeholderText}>
                     {t('Upload your first image')}
                   </Typography>
-                </>
+                </Grid>
               )}
             </InfiniteScroll>
           </Container>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { GridList, GridListTile } from '@material-ui/core';
+import { ImageList, ImageListItem } from '@material-ui/core';
 import { Image } from '../types';
 import ImageThumbnail from './ImageThumbnail';
 
@@ -14,17 +14,17 @@ const ImageGridListTile = ({
   onTileClick: (url: string) => void;
   onNotification: (text: string) => void;
 }) => (
-  <GridList cellHeight={160} cols={cols}>
+  <ImageList rowHeight={160} cols={cols}>
     {images.map((image) => (
-      <GridListTile key={image.filename}>
+      <ImageListItem key={image.filename}>
         <ImageThumbnail
           image={image}
           onTileClick={onTileClick}
           onNotification={onNotification}
         />
-      </GridListTile>
+      </ImageListItem>
     ))}
-  </GridList>
+  </ImageList>
 );
 
 export default React.memo(ImageGridListTile, (prevProps, nextProps) => {
