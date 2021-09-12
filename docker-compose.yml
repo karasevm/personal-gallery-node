@@ -1,0 +1,13 @@
+version: '3'
+services:
+  gallery:
+    image: karasevm/personal-gallery-node
+    ports:
+      - 80:80
+    volumes:
+      - ./images:/images
+      - ./db:/db
+      - ./cache:/cache
+    restart: unless-stopped
+    environment:
+      - CACHE_DIR=/cache
