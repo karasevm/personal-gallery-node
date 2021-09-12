@@ -72,6 +72,9 @@ To use Redis instead of built-it memory cache:
 
 `REDIS_PASSWORD` - Redis password
 
+Or to store cache on disk :
+
+`CACHE_DIR` - Cache directory
 
 
 ### On bare machine

@@ -14,6 +14,7 @@ export const BASE_URL: string = process.env.BASE_URL || '';
 export const { REDIS_HOST } = process.env;
 export const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10);
 export const { REDIS_PASSWORD } = process.env;
+export const { CACHE_DIR } = process.env;
 export const PROXY = process.env.PROXY || true;
 export const { USERNAME } = process.env;
 export const { PASSWORD } = process.env;

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import fileType from 'file-type';
 import logger from '../utils/logger';
 import { imageExists } from '../services/imageService';
-import { thumbnailCache } from '../utils/cache';
+import thumbnailCache from '../utils/cache';
 import { getThumbnail } from '../services/thumbnailService';
 import { FULLS_AS_THUMBS } from '../utils/config';
 
