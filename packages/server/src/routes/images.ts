@@ -29,10 +29,10 @@ class FrontEndImage {
     this.url = encodeURI(`${BASE_URL}/${filename}`);
     this.filename = filename;
     this.thumbnails = [
-      {
-        filetype: 'image/avif',
-        url: `${BASE_URL}/api/thumbnails/${filename}/avif`,
-      },
+      // {
+      //   filetype: 'image/avif',
+      //   url: `${BASE_URL}/api/thumbnails/${filename}/avif`,
+      // },
       {
         filetype: 'image/webp',
         url: `${BASE_URL}/api/thumbnails/${filename}/webp`,
