@@ -19,7 +19,7 @@ Simply drag any file into the window, and the upload area should magically appea
 ![](README/drag.gif)
 
 ### Paste
-Got a screenshot in your clipboard, Ctrl-V and now you-ve got it online.
+Got a screenshot in your clipboard, Ctrl-V and now you've got it online.
 ![](README/paste.gif)
 
 ### API
@@ -42,15 +42,19 @@ Sharing on mobile is easier than ever thanks to the PWA Share Target APIs.
 The image is available on dockerhub, you can start with an example 
 docker-compose below:
 ```yaml
-version: "3"
+version: '3'
 services:
   gallery:
     image: karasevm/personal-gallery-node
-    ports: 
+    ports:
       - 80:80
     volumes:
-      - ./data:/images
+      - ./images:/images
       - ./db:/db
+      - ./cache:/cache
+    restart: unless-stopped
+    environment:
+      - CACHE_DIR=/cache
 ```
 **Environment Variables**
 
