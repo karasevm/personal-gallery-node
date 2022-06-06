@@ -60,7 +60,7 @@ services:
 
 All docker environment variables are optional
 
-`PORT` - which port to listen on, by default set to 3001
+`PORT` - which port to listen on, by default set to 80
 
 `PROXY` - [express proxy settings](https://expressjs.com/en/guide/behind-proxies.html), by default set to `true`
 
