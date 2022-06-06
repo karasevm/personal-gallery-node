@@ -12,6 +12,7 @@ module.exports = {
         location: 'anywhere'
       }
     ],
-    'no-unused-vars': ['error', { varsIgnorePattern: '^_' }]
+    'no-unused-vars': ['error', { varsIgnorePattern: '^_' }],
+    "linebreak-style": 0
   }
 };

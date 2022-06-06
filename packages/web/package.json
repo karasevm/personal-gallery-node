@@ -58,7 +58,8 @@
           ],
           "location": "anywhere"
         }
-      ]
+      ],
+      "linebreak-style": 0
     }
   },
   "browserslist": {
