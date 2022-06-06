@@ -20,8 +20,7 @@
     "react-dom": "^17.0.1",
     "react-dropzone": "^11.3.0",
     "react-i18next": "^11.8.9",
-    "react-infinite-scroller": "^1.2.4",
-    "react-scripts": "~4.0.1",
+    "react-infinite-scroller": "^1.2.6",
     "typescript": "^4.0.3",
     "web-vitals": "^0.2.4",
     "workbox-core": "^6.1.2",
@@ -39,7 +38,16 @@
   "proxy": "http://localhost:3002",
   "eslintConfig": {
     "extends": [
-      "airbnb-typescript"
+      "react-app",
+      "airbnb",
+      "airbnb-typescript",
+      "airbnb/hooks",
+      "plugin:jsx-a11y/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    ],
+    "plugins": [
+      "jsx-a11y"
     ],
     "parserOptions": {
       "project": "./tsconfig.json",
@@ -76,11 +84,14 @@
   },
   "devDependencies": {
     "@types/react-infinite-scroller": "^1.2.1",
-    "@typescript-eslint/eslint-plugin": "^4.4.1",
-    "eslint-config-airbnb-typescript": "^12.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-react-hooks": "^4.0.8"
+    "eslint-plugin-react-hooks": "^4.0.8",
+    "react-scripts": "^5.0.1"
   }
 }
