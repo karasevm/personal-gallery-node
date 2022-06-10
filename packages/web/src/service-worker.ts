@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable no-underscore-dangle */
-/// <reference lib="webworker" />
 /* eslint-disable no-restricted-globals */
+/// <reference lib="webworker" />
 
 // This service worker can be customized!
 // See https://developers.google.com/web/tools/workbox/modules
@@ -27,7 +30,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 // Set up App Shell-style routing, so that all navigation requests
 // are fulfilled with your index.html shell. Learn more at
 // https://developers.google.com/web/fundamentals/architecture/app-shell
-const fileExtensionRegexp = new RegExp('/[^/?]+\\.[^/]+$');
+const fileExtensionRegexp = /\/[^/?]+\.[^/]+$/;
 registerRoute(
   // Return false to exempt requests from being fulfilled by index.html.
   ({ request, url }: { request: Request; url: URL }) => {
@@ -64,7 +67,7 @@ registerRoute(
 );
 
 registerRoute(
-  new RegExp('https?:\\/\\/localhost:3002\\/\\w+\\.\\w+$'),
+  ({ url }) => /^\/\w+\.(mp4|webm|png|webp|gif|avif|jpeg|jpg)/gm.test(url.pathname),
   new CacheFirst({
     cacheName: 'fulls',
     plugins: [

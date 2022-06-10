@@ -1,30 +1,20 @@
+/** @jsxImportSource @emotion/react */
 import {
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  makeStyles,
   TextField,
   Theme,
-} from '@material-ui/core';
+} from '@mui/material';
+import { useTheme } from '@mui/styles';
+import { css } from '@emotion/react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  margin: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-}));
-
-const CredentialChangeDialog = ({
+function CredentialChangeDialog({
   open, onDialogClose, onCredentialsUpdate, onNotification,
 }: {
   open: boolean;
@@ -35,14 +25,25 @@ const CredentialChangeDialog = ({
     password: string
   ) => void;
   onNotification: (text: string) => void;
-}) => {
-  const classes = useStyles();
+}) {
   const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [oldPassword, setOldPassword] = useState('');
 
-  const handleSubmit = async () => {
+  const theme: Theme = useTheme();
+  const styles = {
+    form: css({
+      display: 'flex',
+      flexDirection: 'column',
+    }),
+    margin: css({
+      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1),
+    }),
+  };
+
+  const handleSubmit = () => {
     if (username === '' && password === '') {
       onNotification(t('At least one field must be filled'));
       return;
@@ -55,7 +56,7 @@ const CredentialChangeDialog = ({
       <DialogContent>
         <DialogContentText>{t('enter_new_username')}</DialogContentText>
         <form
-          className={classes.form}
+          css={styles.form}
           onSubmit={(e: React.FormEvent) => {
             e.preventDefault();
             handleSubmit();
@@ -70,7 +71,7 @@ const CredentialChangeDialog = ({
             variant="outlined"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className={classes.margin}
+            css={styles.margin}
           />
           <TextField
             label={t('Password')}
@@ -80,7 +81,7 @@ const CredentialChangeDialog = ({
             variant="outlined"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={classes.margin}
+            css={styles.margin}
           />
           <TextField
             label={t('Old password')}
@@ -90,7 +91,7 @@ const CredentialChangeDialog = ({
             variant="outlined"
             value={oldPassword}
             onChange={(e) => setOldPassword(e.target.value)}
-            className={classes.margin}
+            css={styles.margin}
           />
         </form>
       </DialogContent>
@@ -104,6 +105,6 @@ const CredentialChangeDialog = ({
       </DialogActions>
     </Dialog>
   );
-};
+}
 
 export default CredentialChangeDialog;

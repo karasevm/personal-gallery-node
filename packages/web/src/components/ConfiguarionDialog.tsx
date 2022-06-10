@@ -1,6 +1,6 @@
+/** @jsxImportSource @emotion/react */
 import {
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -9,43 +9,22 @@ import {
   FormControlLabel,
   FormLabel,
   InputLabel,
-  makeStyles,
   MenuItem,
   Radio,
   RadioGroup,
   Select,
   Theme,
   Tooltip,
-} from '@material-ui/core';
+} from '@mui/material';
+import { css } from '@emotion/react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/styles';
 import generateConfig from '../utils/ShareX';
 import { availableLanguages } from '../i18n';
 import { Config, SortBy, SortOrder } from '../types';
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    margin: 'auto',
-    width: 'fit-content',
-  },
-  formControl: {
-    margin: theme.spacing(1),
-  },
-  wide: {
-    width: '100%',
-  },
-  buttonSpan: {
-    display: 'inline-flex',
-    flexGrow: 1,
-  },
-  button: {
-    flexGrow: 1,
-  },
-}));
-
-const ConfigurationDialog = ({
+function ConfigurationDialog({
   open,
   onDialogClose,
   currentSettings,
@@ -61,11 +40,33 @@ const ConfigurationDialog = ({
   onApiKeyChange: () => void;
   onCredentialsChange: () => void;
   apiKey?: string;
-}) => {
+}) {
   const [sortBy, setSortBy] = useState(currentSettings.sortBy);
   const [sortOrder, setSortOrder] = useState(currentSettings.sortOrder);
-  const classes = useStyles();
   const { t, i18n } = useTranslation();
+  const theme: Theme = useTheme();
+
+  const styles = {
+    form: css({
+      display: 'flex',
+      flexDirection: 'column',
+      margin: 'auto',
+      width: 'fit-content',
+    }),
+    formControl: css({
+      margin: theme.spacing(1),
+    }),
+    wide: css({
+      width: '100%',
+    }),
+    buttonSpan: css({
+      display: 'inline-flex',
+      flexGrow: 1,
+    }),
+    button: css({
+      flexGrow: 1,
+    }),
+  };
   const handleSave = () => {
     onSave(sortBy, sortOrder);
   };
@@ -98,8 +99,11 @@ const ConfigurationDialog = ({
         {/* <DialogContentText>
           Configure how you want your list to be displayed.
         </DialogContentText> */}
-        <form className={classes.form} noValidate>
-          <FormControl className={classes.formControl}>
+        <form
+          css={styles.form}
+          noValidate
+        >
+          <FormControl css={styles.formControl}>
             <FormLabel component="legend">{t('Sort By')}</FormLabel>
             <RadioGroup
               row
@@ -122,7 +126,7 @@ const ConfigurationDialog = ({
               />
             </RadioGroup>
           </FormControl>
-          <FormControl className={classes.formControl}>
+          <FormControl css={styles.formControl}>
             <FormLabel component="legend">{t('Sort Direction')}</FormLabel>
             <RadioGroup
               row
@@ -146,14 +150,15 @@ const ConfigurationDialog = ({
             </RadioGroup>
           </FormControl>
         </form>
-        <div className={classes.form}>
-          <FormControl className={classes.formControl}>
+        <div css={styles.form}>
+          <FormControl css={styles.formControl}>
             <InputLabel id="demo-simple-select-label">Language</InputLabel>
             <Select
               labelId="demo-simple-select-label"
+              label="Language"
               id="demo-simple-select"
-              value={i18n.language.slice(0, 2)}
-              onChange={(e) => i18n.changeLanguage(e.target.value as string)}
+              value={i18n.language && i18n.language.slice(0, 2)}
+              onChange={(e) => i18n.changeLanguage(e.target.value)}
             >
               {availableLanguages.map((lang) => (
                 <MenuItem value={lang.short} key={lang.short}>
@@ -163,7 +168,8 @@ const ConfigurationDialog = ({
             </Select>
           </FormControl>
           <Button
-            className={classes.formControl}
+            css={styles.formControl}
+            style={{}}
             variant="contained"
             color="primary"
             onClick={onCredentialsChange}
@@ -171,7 +177,7 @@ const ConfigurationDialog = ({
             {t('Change username/password')}
           </Button>
           <Button
-            className={classes.formControl}
+            css={styles.formControl}
             variant="contained"
             color="primary"
             onClick={onApiKeyChange}
@@ -188,10 +194,10 @@ const ConfigurationDialog = ({
             disableHoverListener={typeof apiKey !== 'undefined'}
             disableTouchListener={typeof apiKey !== 'undefined'}
           >
-            <span className={classes.buttonSpan}>
+            <span css={styles.buttonSpan}>
               <Button
                 disabled={typeof apiKey === 'undefined'}
-                className={`${classes.formControl} ${classes.button}`}
+                css={[styles.formControl, styles.button]}
                 variant="contained"
                 color="primary"
                 onClick={downloadSharexConfig}
@@ -212,6 +218,6 @@ const ConfigurationDialog = ({
       </DialogActions>
     </Dialog>
   );
-};
+}
 
 export default ConfigurationDialog;

@@ -3,13 +3,16 @@ import {
   Image, SortBy, SortOrder, Thumbnail,
 } from '../types';
 import { API_BASE_URL } from '../consts';
+import { hasKey } from './common';
 
 // Type guards
-const isThumbnail = (thumb: any): thumb is Thumbnail => {
+const isThumbnail = (thumb: unknown): thumb is Thumbnail => {
   if (
-    'url' in thumb
+    typeof thumb === 'object'
+    && thumb !== null
+    && hasKey('url', thumb)
     && typeof thumb.url === 'string'
-    && 'filetype' in thumb
+    && hasKey('filetype', thumb)
     && typeof thumb.filetype === 'string'
   ) {
     return true;
@@ -17,17 +20,19 @@ const isThumbnail = (thumb: any): thumb is Thumbnail => {
   return false;
 };
 
-const isThumbnailArray = (thumbnails: any): thumbnails is Thumbnail[] => (
+const isThumbnailArray = (thumbnails: unknown): thumbnails is Thumbnail[] => (
   Array.isArray(thumbnails) && thumbnails.every(isThumbnail)
 );
 
-const isImage = (image: any): image is Image => {
+const isImage = (image: unknown): image is Image => {
   if (
-    'url' in image
+    typeof image === 'object'
+    && image !== null
+    && hasKey('url', image)
     && typeof image.url === 'string'
-    && 'filename' in image
+    && hasKey('filename', image)
     && typeof image.url === 'string'
-    && 'thumbnails' in image
+    && hasKey('thumbnails', image)
     && isThumbnailArray(image.thumbnails)
   ) {
     return true;
@@ -35,7 +40,7 @@ const isImage = (image: any): image is Image => {
   return false;
 };
 
-const isImageArray = (images: any): images is Image[] => (
+const isImageArray = (images: unknown): images is Image[] => (
   Array.isArray(images) && images.every(isImage)
 );
 
@@ -47,16 +52,16 @@ const isImageArray = (images: any): images is Image[] => (
  * @return List of images
  */
 export const getPage = async (
-  page: number = 0,
+  page = 0,
   sortBy: SortBy = SortBy.Date,
   sortOrder: SortOrder = SortOrder.Descending,
 ): Promise<Image[]> => {
-  const { data } = await axios.get(`${API_BASE_URL}/images`, {
+  const response = await axios.get(`${API_BASE_URL}/images`, {
     params: { page, sortBy, sortOrder },
     timeout: 5000,
   });
-  if (isImageArray(data)) {
-    return data;
+  if (isImageArray(response?.data)) {
+    return response.data;
   }
   throw new Error('Malformed response from server');
 };
@@ -70,14 +75,14 @@ export const getPage = async (
 export const uploadImage = async (image: File): Promise<Image> => {
   const formData = new FormData();
   formData.append('file', image);
-  const { data } = await axios.post(`${API_BASE_URL}/images`, formData, {
+  const response = await axios.post(`${API_BASE_URL}/images`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
     timeout: 10000,
   });
-  if (isImage(data)) {
-    return data;
+  if (isImage(response?.data)) {
+    return response.data;
   }
   throw new Error('Malformed response from server');
 };

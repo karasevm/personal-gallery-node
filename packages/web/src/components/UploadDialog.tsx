@@ -1,56 +1,55 @@
 /* eslint-disable react/jsx-props-no-spreading */
+/** @jsxImportSource @emotion/react */
 import React from 'react';
 import {
-  createStyles,
-  Dialog,
-  DialogTitle,
-  IconButton,
-  makeStyles,
-  Theme,
-} from '@material-ui/core';
+  Dialog, DialogTitle, IconButton, Theme,
+} from '@mui/material';
+import { css } from '@emotion/react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/styles';
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  dropzone: {
-    textAlign: 'center',
-    padding: '20px',
-    border: '3px dashed #eeeeee',
-    backgroundColor: '#fafafa',
-    color: '#bdbdbd',
-    marginBottom: '20px',
-    marginLeft: '20px',
-    marginRight: '20px',
-    height: '20vh',
-    minWidth: '40vw',
-    transition: 'border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-  },
-  icon: {
-    fontSize: '2rem',
-  },
-  accept: {
-    borderColor: 'green !important',
-  },
-  reject: {
-    borderColor: 'red !important',
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-}));
-const UploadDialog = ({
+function UploadDialog({
   isOpen, onClose, onDrop, accept,
 }:{
   isOpen: boolean;
   onClose: () => void;
   onDrop: (files: File[]) => void;
   accept: string[];
-}) => {
-  const classes = useStyles();
+}) {
+  const theme: Theme = useTheme();
+  const styles = {
+    dropzone: css({
+      textAlign: 'center',
+      padding: '20px',
+      border: '3px dashed #eeeeee',
+      backgroundColor: '#fafafa',
+      color: '#bdbdbd',
+      marginBottom: '20px',
+      marginLeft: '20px',
+      marginRight: '20px',
+      height: '20vh',
+      minWidth: '40vw',
+      transition: 'border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+    }),
+    icon: css({
+      fontSize: '2rem',
+    }),
+    accept: css({
+      borderColor: 'green !important',
+    }),
+    reject: css({
+      borderColor: 'red !important',
+    }),
+    closeButton: css({
+      position: 'absolute',
+      right: theme.spacing(1),
+      top: theme.spacing(1),
+      color: theme.palette.grey[500],
+    }),
+  };
   const { t } = useTranslation();
+
   const {
     getRootProps,
     getInputProps,
@@ -74,8 +73,9 @@ const UploadDialog = ({
         {t('Upload')}
         <IconButton
           aria-label="close"
-          className={classes.closeButton}
+          css={styles.closeButton}
           onClick={onClose}
+          size="large"
         >
           <span className="material-icons">close</span>
         </IconButton>
@@ -83,13 +83,15 @@ const UploadDialog = ({
       <section>
         <div
           {...getRootProps({
-            className: `dropzone ${classes.dropzone} ${
-              isDragAccept ? classes.accept : null
-            } ${isDragReject ? classes.reject : null}`,
+            css: [
+              styles.dropzone,
+              isDragAccept ? styles.accept : null,
+              isDragReject ? styles.reject : null],
+            className: 'dropzone ',
           })}
         >
           <input {...getInputProps()} />
-          <span className={classes.icon}>
+          <span css={styles.icon}>
             {isDragActive ? null : '📁'}
             {isDragAccept ? '📂' : null}
             {isDragReject ? '❌' : null}
@@ -99,6 +101,6 @@ const UploadDialog = ({
       </section>
     </Dialog>
   );
-};
+}
 
 export default UploadDialog;

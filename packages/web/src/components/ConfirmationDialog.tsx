@@ -5,12 +5,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from '@material-ui/core';
+} from '@mui/material';
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 
-const ConfirmationDialog = ({
+function ConfirmationDialog({
   open, header, content, onConfirm, onCancel,
 }:{
   open: boolean;
@@ -18,7 +18,7 @@ const ConfirmationDialog = ({
   content?: string;
   onConfirm: () => void;
   onCancel: () => void;
-}) => {
+}) {
   const { t } = useTranslation();
   return (
     <Dialog onClose={onCancel} open={open} aria-labelledby="dialog-title">
@@ -36,6 +36,6 @@ const ConfirmationDialog = ({
       </DialogActions>
     </Dialog>
   );
-};
+}
 
 export default ConfirmationDialog;

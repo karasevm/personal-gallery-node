@@ -19,7 +19,8 @@ i18n
     react: {
       useSuspense: false,
     },
-  });
+  })
+  .catch((e) => { console.error(e); });
 
 export const availableLanguages = [
   {

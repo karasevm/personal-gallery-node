@@ -1,17 +1,18 @@
-import { ButtonBase, ImageListItemBar, IconButton } from '@material-ui/core';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
+/** @jsxImportSource @emotion/react */
+import { ButtonBase, ImageListItemBar, IconButton } from '@mui/material';
+import { css } from '@emotion/react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image } from '../types';
 
-const useStyles = makeStyles(() => createStyles({
-  image: {
+const styles = {
+  image: css({
     cursor: 'pointer',
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-  },
-  link: {
+  }),
+  link: css({
     width: '100%',
     height: '100%',
     '&:hover': {
@@ -20,51 +21,50 @@ const useStyles = makeStyles(() => createStyles({
     '&:focus': {
       opacity: '0.9',
     },
-  },
-  item: {
+  }),
+  item: css({
     opacity: '0',
     transition: 'opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
     width: '100%',
     height: '100%',
-  },
-  fadeIn: {
+  }),
+  fadeIn: css({
     opacity: '100',
     backgroundColor: '#fff',
-  },
-  titleBar: {
+  }),
+  titleBar: css({
     background: 'rgba(0, 0, 0, 0)',
     width: '48px',
-  },
-  icon: {
+  }),
+  icon: css({
     color: 'white',
     filter: 'drop-shadow(2px 4px 3px #222222)',
-  },
-  container: {
+  }),
+  container: css({
     width: '100%',
     height: '100%',
     backgroundColor: '#ebebeb',
-  },
-}));
+  }),
+};
 
-const ImageThumbnail = ({ image, onTileClick, onNotification }:{
+function ImageThumbnail({ image, onTileClick, onNotification }:{
   image: Image;
   onTileClick: (url: string) => void;
   onNotification: (text: string) => void;
-}) => {
+}) {
   const [loaded, setLoaded] = useState(false);
-  const classes = useStyles();
   const { t } = useTranslation();
   const copyToClipboard = async (stringToCopy: string) => {
     await navigator.clipboard.writeText(stringToCopy);
     onNotification(t('Copied link to clipboard'));
   };
   return (
-    <div className={classes.container}>
-      <div className={`${classes.item} ${loaded ? classes.fadeIn : null}`}>
-        <ButtonBase disableTouchRipple className={classes.link} tabIndex="-1">
+    <div css={styles.container}>
+      <div css={[styles.item, loaded ? styles.fadeIn : null]}>
+        <ButtonBase disableTouchRipple css={styles.link}>
           <a
             href={image.url}
-            className={classes.link}
+            css={styles.link}
             onClick={(e: React.MouseEvent) => {
               e.preventDefault();
               onTileClick(image.url);
@@ -80,7 +80,7 @@ const ImageThumbnail = ({ image, onTileClick, onNotification }:{
               ))}
               <img
                 loading="lazy"
-                className={classes.image}
+                css={styles.image}
                 src={
                   image.thumbnails.filter(
                     (thumb) => thumb.filetype === 'image/jpeg',
@@ -96,23 +96,24 @@ const ImageThumbnail = ({ image, onTileClick, onNotification }:{
           position="top"
           actionIcon={(
             <IconButton
-              className={classes.icon}
+              css={styles.icon}
               onClick={() => {
-                copyToClipboard(
+                void copyToClipboard(
                   `${window.location.href.replace(/\/$/, '')}${image.url}`,
                 );
               }}
+              size="large"
             >
               {/* <FileCopyOutlinedIcon /> */}
               <span className="material-icons">content_copy</span>
             </IconButton>
           )}
           actionPosition="left"
-          className={classes.titleBar}
+          css={styles.titleBar}
         />
       </div>
     </div>
   );
-};
+}
 
 export default ImageThumbnail;

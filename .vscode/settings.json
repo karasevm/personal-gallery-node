@@ -1,8 +1,7 @@
 {
-  "prettier.enable": false,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "eslint.workingDirectories": [
-        "./packages/web",
-        "./packages/server"
-    ]
+  "eslint.workingDirectories": ["./packages/web", "./packages/server"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  }
 }

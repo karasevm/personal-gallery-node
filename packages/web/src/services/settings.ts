@@ -17,6 +17,7 @@ export const getUserState = (): boolean => {
   if (serializedUserState === null) {
     return false;
   }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const userState = JSON.parse(serializedUserState);
   if (typeof userState !== 'boolean') {
     return false;

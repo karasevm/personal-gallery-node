@@ -23,9 +23,12 @@ export const doLogin = async (
       },
     );
     return status;
-  } catch (e: any) {
-    console.error(e);
-    return e.response.status || 500;
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      console.error(e);
+      return e?.response?.status || 500;
+    }
+    return 500;
   }
 };
 
@@ -45,9 +48,12 @@ export const doRegister = async (
       },
     );
     return status;
-  } catch (e: any) {
-    console.error(e);
-    return e.response.status || 500;
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      console.error(e);
+      return e?.response?.status || 500;
+    }
+    return 500;
   }
 };
 

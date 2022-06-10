@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider, createTheme, Theme } from '@mui/material/styles';
+
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import '@fontsource/roboto/300.css';
@@ -16,11 +18,26 @@ import './icons/icons.css';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import './i18n';
 
+declare module '@mui/styles/defaultTheme' {
+  type DefaultTheme = Theme;
+}
 serviceWorkerRegistration.register();
+const theme = createTheme({
+  palette: {
+    primary: {
+      light: '#757ce8',
+      main: '#3f50b5',
+      dark: '#002884',
+      contrastText: '#fff',
+    },
+  },
+});
 ReactDOM.render(
   <React.StrictMode>
     <CssBaseline>
-      <App />
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
     </CssBaseline>
   </React.StrictMode>,
   document.getElementById('root'),

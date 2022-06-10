@@ -1,21 +1,22 @@
+/** @jsxImportSource @emotion/react */
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Container,
-  makeStyles,
   Theme,
-  createStyles,
-  withWidth,
-  WithWidth,
   Dialog,
   CircularProgress,
   IconButton,
   Snackbar,
   Grid,
   Typography,
-} from '@material-ui/core';
+  Breakpoint,
+  useMediaQuery,
+} from '@mui/material';
+import { css } from '@emotion/react';
 import InfiniteScroll from 'react-infinite-scroller';
-import { AxiosError } from 'axios';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/styles';
 import * as imageService from './services/images';
 import * as settingsService from './services/settings';
 import * as loginService from './services/login';
@@ -32,62 +33,22 @@ import LoginView from './components/LoginView';
 import ConfirmationDialog from './components/ConfirmationDialog';
 import CredentialChangeDialog from './components/CredentialChangeDialog';
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  root: {
-    height: '100vh',
-  },
-  titleBar: {
-    background:
-        'linear-gradient(to bottom, rgba(0,0,0,0) 0%, '
-        + 'rgba(0,0,0,0) 70%, rgba(0,0,0,0) 100%)',
-    transition: 'background 2s ease-out',
-    '&:hover': {
-      background:
-          'linear-gradient(to bottom, rgba(0,0,0,0) 0%, '
-          + 'rgba(0,0,0,0) 70%, rgba(0,0,0,0) 100%)',
-    },
-  },
-  icon: {
-    color: 'white',
-    filter: 'drop-shadow(2px 4px 3px #222222)',
-  },
-  listItem: {
-    cursor: 'pointer',
-    '&:hover': {
-      opacity: '0.9',
-    },
-  },
-  dialogImage: {
-    maxHeight: '80vh',
-  },
-  loader: {
-    margin: '1rem',
-  },
-  toolbarTitle: {
-    flexGrow: 1,
-  },
-  toolbarButton: {
-    flexGrow: 1,
-  },
-  placeholderText: {
-    textAlign: 'center',
-    margin: theme.spacing(1),
-    color: '#696969',
-  },
-  placeholderIconContainer: {
-    textAlign: 'center',
-    color: '#696969',
-  },
-  placeholderIcon: {
-    fontSize: '96px',
-    verticalAlign: '-25%',
-  },
-}));
+function useWidth() {
+  const theme: Theme = useTheme();
+  const keys: readonly Breakpoint[] = [...theme.breakpoints.keys].reverse();
+  return (
+    keys.reduce((output: Breakpoint | null, key: Breakpoint) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const matches = useMediaQuery(theme.breakpoints.up(key));
+      return !output && matches ? key : output;
+    }, null) || 'xs'
+  );
+}
 
-function App(props: WithWidth) {
+function App() {
   const [modalImage, setModalImage] = useState('');
   const [modalVideo, setModalVideo] = useState('');
-  const [imagesData, setImagesData] = useState<any>(undefined);
+  const [imagesData, setImagesData] = useState<{ [key: number]: Image[]; }>({});
   const imagesPage = useRef(0);
   const [hasMore, setHasMore] = useState(true);
   const [userSettings, setUserSettings] = useState<Config | undefined>(
@@ -114,14 +75,65 @@ function App(props: WithWidth) {
   const [setupFinished, setSetupFinished] = useState(true);
   const [apiKey, setApiKey] = useState<string | undefined>();
 
-  const { width } = props;
+  const theme: Theme = useTheme();
+  const styles = {
+    root: css({
+      height: '100vh',
+    }),
+    titleBar: css({
+      background:
+          'linear-gradient(to bottom, rgba(0,0,0,0) 0%, '
+          + 'rgba(0,0,0,0) 70%, rgba(0,0,0,0) 100%)',
+      transition: 'background 2s ease-out',
+      '&:hover': {
+        background:
+            'linear-gradient(to bottom, rgba(0,0,0,0) 0%, '
+            + 'rgba(0,0,0,0) 70%, rgba(0,0,0,0) 100%)',
+      },
+    }),
+    icon: css({
+      color: 'white',
+      filter: 'drop-shadow(2px 4px 3px #222222)',
+    }),
+    listItem: css({
+      cursor: 'pointer',
+      '&:hover': {
+        opacity: '0.9',
+      },
+    }),
+    dialogImage: css({
+      maxHeight: '80vh',
+    }),
+    loader: css({
+      margin: '1rem',
+    }),
+    toolbarTitle: css({
+      flexGrow: 1,
+    }),
+    toolbarButton: css({
+      flexGrow: 1,
+    }),
+    placeholderText: css({
+      textAlign: 'center',
+      margin: theme.spacing(1),
+      color: '#696969',
+    }),
+    placeholderIconContainer: css({
+      textAlign: 'center',
+      color: '#696969',
+    }),
+    placeholderIcon: css({
+      fontSize: '96px',
+      verticalAlign: '-25%',
+    }),
+  };
+  const width = useWidth();
   const { t } = useTranslation();
 
   const widthMap = {
     xs: 3, sm: 4, md: 5, lg: 6, xl: 6,
   };
   const cols = widthMap[width];
-  const classes = useStyles();
 
   useEffect(() => {
     // imageService.getAll().then(result => setImagesData(result));
@@ -130,7 +142,7 @@ function App(props: WithWidth) {
       setSetupFinished(result.setupFinished);
       setUserSettings(settingsService.getSettings());
       setUserLoggedIn(settingsService.getUserState());
-    });
+    }).catch((e) => console.error(e));
   }, []);
   const imageTileClickHandler = (url: string) => {
     if (/\.(mp4|webm)$/.test(url)) {
@@ -140,9 +152,9 @@ function App(props: WithWidth) {
     }
   };
 
-  const handleLogout = async (clientOnly: boolean = false) => {
+  const handleLogout = async (clientOnly = false) => {
     if (!clientOnly) {
-      loginService.doLogout();
+      await loginService.doLogout();
     }
     setUserLoggedIn(false);
     setDragOpen(false);
@@ -166,17 +178,19 @@ function App(props: WithWidth) {
         if (result.length === 0) {
           setHasMore(false);
         } else {
-          setImagesData((data: any) => ({ ...data, [page]: result }));
+          setImagesData((data) => ({ ...data, [page]: result }));
         }
       })
-      .catch((e: AxiosError) => {
-        if (e.response?.status === 401) {
-          handleLogout(true);
-          setNotification(t('Authorization error, please login'));
-        } else {
-          setNotification(t('Error getting image list from server'));
+      .catch((e) => {
+        if (axios.isAxiosError(e)) {
+          if (e.response?.status === 401) {
+            void handleLogout(true);
+            setNotification(t('Authorization error, please login'));
+          } else {
+            setNotification(t('Error getting image list from server'));
+          }
+          imagesPage.current -= 1;
         }
-        imagesPage.current -= 1;
       });
     imagesPage.current += 1;
   };
@@ -193,7 +207,7 @@ function App(props: WithWidth) {
     try {
       const combinedResult = await Promise.all(promises);
       if (combinedResult.length > 0) {
-        setImagesData((data: { [key:number]: Image[] }) => {
+        setImagesData((data) => {
           if (data === undefined || Object.keys(data).length === 0) {
             return { [-1]: combinedResult };
           }
@@ -215,7 +229,7 @@ function App(props: WithWidth) {
         if (acceptedUploadFiletypes.includes(item.type)) {
           const pasteAsFile = item.getAsFile();
           if (pasteAsFile !== null) {
-            handleUpload([pasteAsFile]);
+            void handleUpload([pasteAsFile]);
           }
         }
       });
@@ -272,10 +286,10 @@ function App(props: WithWidth) {
   ) => {
     try {
       await userService.updateCredentials(oldPassword, username, password);
-      handleLogout();
+      void handleLogout();
       setNotification(t('Please login with your new credentials'));
-    } catch (e: any) {
-      if (e.response.status === 401) {
+    } catch (e) {
+      if (axios.isAxiosError(e) && e?.response?.status === 401) {
         setNotification(t('Check your old password and try again'));
       }
     }
@@ -284,13 +298,13 @@ function App(props: WithWidth) {
   if (userSettings === undefined || userLoggedIn === undefined) {
     return (
       <Grid container justifyContent="center">
-        <CircularProgress className={classes.loader} />
+        <CircularProgress css={styles.loader} />
       </Grid>
     );
   }
   return (
     <div
-      className={classes.root}
+      css={styles.root}
       onDragEnter={() => setDragOpen(true)}
       onPaste={handlePaste}
     >
@@ -308,28 +322,34 @@ function App(props: WithWidth) {
               hasMore={hasMore}
               loader={(
                 <Grid key="asdf" container justifyContent="center">
-                  <CircularProgress className={classes.loader} />
+                  <CircularProgress css={styles.loader} />
                 </Grid>
               )}
             >
               {typeof imagesData === 'object' && Object.keys(imagesData).length !== 0 ? (
                 <ImageGridListTile
-                  images={[...new Set(Object.keys(imagesData).sort((a:any, b:any) => a - b).reduce(
-                    (r, k) => (r.concat(imagesData[k])),
-                    [],
-                  ))]}
+                  images={
+                    [
+                      ...new Set(Object.keys(imagesData)
+                        .map(Number)
+                        .sort((a:number, b:number) => a - b)
+                        .reduce(
+                          (r: Image[], k) => (r.concat(imagesData[k])),
+                          [],
+                        ))]
+}
                   cols={cols}
                   onTileClick={imageTileClickHandler}
                   onNotification={setNotification}
                 />
               ) : (
                 <Grid key="qwerty">
-                  <div className={classes.placeholderIconContainer}>
-                    <span className={`material-icons-outlined ${classes.placeholderIcon}`}>
+                  <div css={styles.placeholderIconContainer}>
+                    <span css={styles.placeholderIcon} className="material-icons-outlined">
                       insert_photo
                     </span>
                   </div>
-                  <Typography className={classes.placeholderText}>
+                  <Typography css={styles.placeholderText}>
                     {t('Upload your first image')}
                   </Typography>
                 </Grid>
@@ -352,12 +372,12 @@ function App(props: WithWidth) {
         maxWidth="lg"
       >
         {modalImage !== '' ? (
-          <img className={classes.dialogImage} src={modalImage} alt="" />
+          <img css={styles.dialogImage} src={modalImage} alt="" />
         ) : null}
         {modalVideo !== '' ? (
           // eslint-disable-next-line jsx-a11y/media-has-caption
           <video
-            className={classes.dialogImage}
+            css={styles.dialogImage}
             autoPlay
             controls
             src={modalVideo}
@@ -384,7 +404,7 @@ function App(props: WithWidth) {
         content={t('This will invalidate your previous API key, continue?')}
         open={confirmDialogOpen}
         onConfirm={() => {
-          handleApiKeyChange();
+          void handleApiKeyChange();
           setConfirmDialogOpen(false);
         }}
         onCancel={() => setConfirmDialogOpen(false)}
@@ -405,20 +425,18 @@ function App(props: WithWidth) {
         onClose={() => setNotification('')}
         message={notification}
         action={(
-          <>
-            <IconButton
-              size="small"
-              aria-label="close"
-              color="inherit"
-              onClick={() => setNotification('')}
-            >
-              <span className="material-icons">close</span>
-            </IconButton>
-          </>
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={() => setNotification('')}
+          >
+            <span className="material-icons">close</span>
+          </IconButton>
         )}
       />
     </div>
   );
 }
 
-export default withWidth()(App);
+export default App;

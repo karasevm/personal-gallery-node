@@ -1,9 +1,11 @@
+/** @jsxImportSource @emotion/react */
 import React from 'react';
-import { ImageList, ImageListItem } from '@material-ui/core';
+import { css } from '@emotion/react';
+import { ImageList, ImageListItem } from '@mui/material';
 import { Image } from '../types';
 import ImageThumbnail from './ImageThumbnail';
 
-const ImageGridListTile = ({
+function ImageGridListTile({
   images,
   cols,
   onTileClick,
@@ -13,19 +15,21 @@ const ImageGridListTile = ({
   cols: number;
   onTileClick: (url: string) => void;
   onNotification: (text: string) => void;
-}) => (
-  <ImageList rowHeight={160} cols={cols}>
-    {images.map((image) => (
-      <ImageListItem key={image.filename}>
-        <ImageThumbnail
-          image={image}
-          onTileClick={onTileClick}
-          onNotification={onNotification}
-        />
-      </ImageListItem>
-    ))}
-  </ImageList>
-);
+}) {
+  return (
+    <ImageList css={css({ margin: 0, overflowY: 'hidden' })} rowHeight={160} cols={cols}>
+      {images.map((image) => (
+        <ImageListItem key={image.filename}>
+          <ImageThumbnail
+            image={image}
+            onTileClick={onTileClick}
+            onNotification={onNotification}
+          />
+        </ImageListItem>
+      ))}
+    </ImageList>
+  );
+}
 
 export default React.memo(ImageGridListTile, (prevProps, nextProps) => {
   if (

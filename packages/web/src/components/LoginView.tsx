@@ -1,36 +1,27 @@
-import {
-  AppBar,
-  Button,
-  createStyles,
-  Grid,
-  makeStyles,
-  TextField,
-  Theme,
-  Toolbar,
-  Typography,
-} from '@material-ui/core';
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react'; import {
+  AppBar, Button, Grid, TextField, Theme, Toolbar, Typography,
+} from '@mui/material';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/styles';
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  margin: {
-    margin: theme.spacing(1),
-  },
-  header: {
-    textAlign: 'center',
-    fontWeight: 300,
-  },
-}));
-
-const LoginView = (
-  { onLogin, setupFinished }:
-  {
-    onLogin: (username: string, password: string) => void;
-    setupFinished: boolean;
-  },
-) => {
-  const classes = useStyles();
+function LoginView({ onLogin, setupFinished }:
+{
+  onLogin: (username: string, password: string) => void;
+  setupFinished: boolean;
+}) {
   const { t } = useTranslation();
+  const theme: Theme = useTheme();
+  const styles = {
+    margin: css({
+      margin: theme.spacing(1),
+    }),
+    header: css({
+      textAlign: 'center',
+      fontWeight: 300,
+    }),
+  };
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -44,13 +35,12 @@ const LoginView = (
       <Grid
         container
         spacing={0}
-        direction="column"
         alignItems="center"
         justifyContent="center"
         style={{ minHeight: '80vh' }}
       >
-        <Grid item xs={10} md={4}>
-          <Typography variant="h3" className={classes.header}>
+        <Grid item xs={8} md={6}>
+          <Typography variant="h3" css={styles.header}>
             {setupFinished ? t('Login') : t('Register')}
           </Typography>
           <form
@@ -68,7 +58,7 @@ const LoginView = (
               variant="outlined"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className={classes.margin}
+              css={styles.margin}
             />
             <TextField
               id="outlined-password-input"
@@ -79,13 +69,13 @@ const LoginView = (
               variant="outlined"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={classes.margin}
+              css={styles.margin}
             />
             <Button
               variant="contained"
               color="primary"
               type="submit"
-              className={classes.margin}
+              css={styles.margin}
               fullWidth
             >
               {setupFinished ? t('Login') : t('Register')}
@@ -95,6 +85,6 @@ const LoginView = (
       </Grid>
     </div>
   );
-};
+}
 
 export default LoginView;
