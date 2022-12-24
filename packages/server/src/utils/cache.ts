@@ -21,9 +21,9 @@ if (typeof REDIS_HOST !== 'undefined') {
 } else if (typeof CACHE_DIR !== 'undefined') {
   thumbnailCache = cacheManager.caching({
     store: fsStore,
+    ttl: 60 * 60 * 24 * 365, // time to life in seconds
     options: {
       path: CACHE_DIR, // path for cached files
-      ttl: 60 * 60 * 24 * 365, // time to life in seconds
       subdirs: true, // create subdirectories to reduce the files in a single dir (default: false)
       zip: true, // zip files to save diskspace (default: false)
     },
