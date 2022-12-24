@@ -3,12 +3,12 @@
   "version": "1.1.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.8.1",
-    "@fontsource/roboto": "^4.2.1",
-    "@mui/material": "^5.8.2",
-    "@mui/styles": "^5.8.0",
-    "@testing-library/jest-dom": "^5.11.4",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@fontsource/roboto": "^4.5.8",
+    "@mui/material": "^5.11.1",
+    "@mui/styles": "^5.11.1",
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "@types/jest": "^26.0.15",
@@ -24,13 +24,13 @@
     "react-dropzone": "^11.3.0",
     "react-i18next": "^11.8.9",
     "react-infinite-scroller": "^1.2.6",
-    "typescript": "^4.0.3",
+    "typescript": "^4.9.4",
     "web-vitals": "^0.2.4",
-    "workbox-core": "^6.1.2",
-    "workbox-expiration": "^6.1.2",
-    "workbox-precaching": "^6.1.2",
-    "workbox-routing": "^6.1.2",
-    "workbox-strategies": "^6.1.2"
+    "workbox-core": "^6.5.4",
+    "workbox-expiration": "^6.5.4",
+    "workbox-precaching": "^6.5.4",
+    "workbox-routing": "^6.5.4",
+    "workbox-strategies": "^6.5.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -82,6 +82,14 @@
         {
           "checksVoidReturn": false
         }
+      ],
+      "react/no-unknown-property": [
+        "error",
+        {
+          "ignore": [
+            "css"
+          ]
+        }
       ]
     }
   },
@@ -98,15 +106,15 @@
     ]
   },
   "devDependencies": {
-    "@types/react-infinite-scroller": "^1.2.1",
-    "@typescript-eslint/eslint-plugin": "^5.13.0",
-    "@typescript-eslint/parser": "^5.0.0",
+    "@types/react-infinite-scroller": "^1.2.3",
+    "@typescript-eslint/eslint-plugin": "^5.47.0",
+    "@typescript-eslint/parser": "^5.47.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-react-hooks": "^4.0.8",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-react": "^7.31.11",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "react-scripts": "^5.0.1"
   }
 }
