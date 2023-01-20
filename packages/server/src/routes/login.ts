@@ -15,7 +15,7 @@ loginRouter.post('/', async (req, res) => {
     res.cookie('personal-gallery_auth', result, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',
       expires: new Date(new Date().setFullYear(new Date().getFullYear() + 3)),
     });
     res.status(200).json({ status: 'success' });
@@ -40,7 +40,7 @@ loginRouter.post('/register', async (req, res) => {
     res.cookie('personal-gallery_auth', result, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production' && req.protocol === 'https',
-      sameSite: 'lax',
+      sameSite: 'strict',
       expires: new Date(new Date().setFullYear(new Date().getFullYear() + 3)),
     });
     res.status(200).json({ status: 'success' });
@@ -54,7 +54,7 @@ loginRouter.post('/logout', async (req, res) => {
   res.cookie('personal-gallery_auth', '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production' && req.protocol === 'https',
-    sameSite: 'lax',
+    sameSite: 'strict',
     expires: new Date(0),
   });
   res.set('Clear-Site-Data', '"cache", "cookies", "storage"');
