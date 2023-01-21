@@ -64,6 +64,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "morgan": "^1.10.0",
     "nanoid": "^3.3.4",
+    "sanitize-filename": "^1.6.3",
     "sharp": "^0.31.3",
     "tmp": "^0.2.1",
     "winston": "^3.8.2"

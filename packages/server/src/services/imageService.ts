@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import fileType from 'file-type';
+import sanitize from "sanitize-filename";
 import { customAlphabet } from 'nanoid/async';
 import { getImagesFromDB, insertImageIntoDB } from '../utils/db';
 import logger from '../utils/logger';
@@ -98,7 +99,7 @@ export const getImages = async (
 export const getImage = async (filename: string): Promise<Image> => {
   try {
     logger.verbose(`Looking for file ${filename}...`);
-    const file = fs.readFileSync(path.join(IMAGE_DIR, filename));
+    const file = fs.readFileSync(path.join(IMAGE_DIR, sanitize(filename)));
     logger.verbose('Found.');
     const type = await fileType.fromBuffer(file);
     if (type === undefined) {
@@ -117,7 +118,7 @@ export const getImage = async (filename: string): Promise<Image> => {
  */
 export const imageExists = async (filename: string): Promise<boolean> => {
   try {
-    if (fs.existsSync(path.join(IMAGE_DIR, filename))) {
+    if (fs.existsSync(path.join(IMAGE_DIR, sanitize(filename)))) {
       return true;
     }
     return false;
