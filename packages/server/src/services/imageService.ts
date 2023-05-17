@@ -1,4 +1,4 @@
-import fs from 'fs';
+import { Stats, promises as fs } from "fs";
 import path from 'path';
 import fileType from 'file-type';
 import sanitize from "sanitize-filename";
@@ -17,16 +17,16 @@ const nanoid = customAlphabet(alphabet, 7);
  */
 export const registerFileInFolder = async () => {
   try {
-    const files = fs.readdirSync(IMAGE_DIR);
+    const files = await fs.readdir(IMAGE_DIR);
     const filesWithStats = await Promise.all(
-      files.map((filename) => fs.promises
+      files.map((filename) => fs
         .stat(path.join(IMAGE_DIR, filename))
         .then((stat) => ({ filename, stat }))),
     );
 
     const filteredFilesWithStats:{
       filename: string;
-      stat: fs.Stats;
+      stat: Stats;
     }[] = [];
 
     const filePromises = filesWithStats.map(async (file) => {
@@ -68,7 +68,7 @@ export const addImage = async (
   const newFileName = `${await nanoid()}.${extension}`;
   const newFilePath = path.join(IMAGE_DIR, newFileName);
   logger.verbose(`Saving buffer into ${newFilePath}`);
-  fs.writeFileSync(newFilePath, fileData);
+  await fs.writeFile(newFilePath, fileData);
   insertImageIntoDB(newFileName);
   return newFileName;
 };
@@ -99,7 +99,7 @@ export const getImages = async (
 export const getImage = async (filename: string): Promise<Image> => {
   try {
     logger.verbose(`Looking for file ${filename}...`);
-    const file = fs.readFileSync(path.join(IMAGE_DIR, sanitize(filename)));
+    const file = await fs.readFile(path.join(IMAGE_DIR, sanitize(filename)));
     logger.verbose('Found.');
     const type = await fileType.fromBuffer(file);
     if (type === undefined) {
@@ -118,7 +118,9 @@ export const getImage = async (filename: string): Promise<Image> => {
  */
 export const imageExists = async (filename: string): Promise<boolean> => {
   try {
-    if (fs.existsSync(path.join(IMAGE_DIR, sanitize(filename)))) {
+    if (await fs.access(path.join(IMAGE_DIR, sanitize(filename)), fs.constants.F_OK)
+      .then(() => true)
+      .catch(() => false)) {
       return true;
     }
     return false;
