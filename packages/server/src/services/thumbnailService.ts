@@ -2,8 +2,7 @@
 import sharp from 'sharp';
 import ffmpeg from 'fluent-ffmpeg';
 import tmp from 'tmp';
-import fs from 'fs';
-import util from 'util';
+import { promises as fs } from "fs";
 import path from 'path';
 import { FFMPEG_EXISTS, IMAGE_DIR } from '../utils/config';
 import { getImage } from './imageService';
@@ -54,8 +53,6 @@ export const getThumbnail = async (
   height: number = 160,
 ): Promise<Buffer> => {
   const image = await getImage(filename);
-  const readFilePromise = util.promisify(fs.readFile);
-  const unlinkFilePromise = util.promisify(fs.unlink);
   let { imagebuffer } = image;
   logger.verbose('Thumbnail cache miss.');
   // Take a screenshot from videos
@@ -71,8 +68,8 @@ export const getThumbnail = async (
         path.join(IMAGE_DIR, filename),
         tmpDir.name,
       );
-      imagebuffer = await readFilePromise(`${tmpDir.name}/temp.png`);
-      await unlinkFilePromise(`${tmpDir.name}/temp.png`);
+      imagebuffer = await fs.readFile(`${tmpDir.name}/temp.png`);
+      await fs.unlink(`${tmpDir.name}/temp.png`);
     } catch (e: any) {
       logger.error(`${e.name}:${e.message}`);
     }
