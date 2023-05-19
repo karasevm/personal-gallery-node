@@ -16,7 +16,7 @@ if (typeof REDIS_HOST !== 'undefined') {
     port: REDIS_PORT,
     password: REDIS_PASSWORD,
     db: 0,
-    ttl: 600,
+    ttl: 60 * 60 * 24 * 365,
   });
 } else if (typeof CACHE_DIR !== 'undefined') {
   thumbnailCache = cacheManager.caching({
@@ -25,7 +25,7 @@ if (typeof REDIS_HOST !== 'undefined') {
     options: {
       path: CACHE_DIR, // path for cached files
       subdirs: true, // create subdirectories to reduce the files in a single dir (default: false)
-      zip: true, // zip files to save diskspace (default: false)
+      zip: false, // zip files to save diskspace (default: false)
     },
   });
 } else {
