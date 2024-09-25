@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS frontend-build
+FROM node:lts-bullseye-slim AS frontend-build
 
 WORKDIR /app
 
