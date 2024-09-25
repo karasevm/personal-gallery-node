@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import bcrypt from 'bcryptjs';
-import * as db from './db';
-import logger from './logger';
+import * as db from './db.js';
+import logger from './logger.js';
 
 /**
  * Validates passed credentials
@@ -15,8 +16,8 @@ export const validateCredentials = async (
   try {
     return (await bcrypt.compare(password, db.getMeta('password')))
     && username === db.getMeta('username');
-  } catch (e:any) {
-    logger.error(`validateCredentials: ${e.message}`);
+  } catch (error: any) {
+    logger.error(`validateCredentials: ${error.message}`);
     return false;
   }
 };

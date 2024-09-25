@@ -1,21 +1,21 @@
-import { Request, Router } from 'express';
-import fileType from 'file-type';
+import {type Request, Router} from 'express';
+import {fileTypeFromBuffer} from 'file-type';
 import sharp from 'sharp';
-import { SortBy, SortOrder, ThumbnailMeta } from '../types';
+import {SortBy, SortOrder, type ThumbnailMeta} from '../types.js';
 import {
   addImage,
   getImages,
   registerFileInFolder,
-} from '../services/imageService';
-import logger from '../utils/logger';
-import { ACCEPTED_MIME } from '../utils/consts';
-import { BASE_URL } from '../utils/config';
+} from '../services/imageService.js';
+import logger from '../utils/logger.js';
+import {ACCEPTED_MIME} from '../utils/consts.js';
+import {BASE_URL} from '../utils/config.js';
 
 const imagesRouter = Router();
 
-imagesRouter.post('/refresh', async (_, res) => {
+imagesRouter.post('/refresh', async (_, response) => {
   await registerFileInFolder();
-  res.status(200).end();
+  response.status(200).end();
 });
 
 class FrontEndImage {
@@ -25,7 +25,7 @@ class FrontEndImage {
 
   thumbnails: ThumbnailMeta[];
 
-  constructor(req: Request, filename: string) {
+  constructor(request: Request, filename: string) {
     this.url = encodeURI(`${BASE_URL}/${filename}`);
     this.filename = filename;
     this.thumbnails = [
@@ -46,79 +46,103 @@ class FrontEndImage {
 }
 
 // Image listing
-imagesRouter.get('/', async (req, res) => {
+imagesRouter.get('/', async (request, response) => {
   let sortBy = SortBy.Name;
-  switch (req.query.sortBy) {
-    case 'filename':
+  switch (request.query.sortBy) {
+    case 'filename': {
       sortBy = SortBy.Name;
       break;
-    case 'added':
+    }
+
+    case 'added': {
       sortBy = SortBy.Date;
       break;
-    default:
+    }
+
+    default: {
       break;
+    }
   }
+
   let sortOrder = SortOrder.Ascending;
-  switch (req.query.sortOrder) {
-    case 'ASC':
+  switch (request.query.sortOrder) {
+    case 'ASC': {
       sortOrder = SortOrder.Ascending;
       break;
-    case 'DESC':
+    }
+
+    case 'DESC': {
       sortOrder = SortOrder.Descending;
       break;
-    default:
+    }
+
+    default: {
       break;
+    }
   }
+
   let page = 0;
   if (
-    typeof req.query.page === 'string'
-    && !Number.isNaN(parseInt(req.query.page, 10))
-    && parseInt(req.query.page, 10) > 0
+    typeof request.query.page === 'string'
+    && !Number.isNaN(Number.parseInt(request.query.page, 10))
+    && Number.parseInt(request.query.page, 10) > 0
   ) {
-    page = parseInt(req.query.page, 10);
+    page = Number.parseInt(request.query.page, 10);
   }
-  logger.verbose(`Sort order:${sortOrder}`);
-  res.set('Cache-Control', 'no-store, max-age=0');
-  res.json(
-    (await getImages(sortBy, 10, sortOrder, page)).map(
-      (val) => new FrontEndImage(req, val),
+
+  logger.verbose(`Requested images. Sort by:${sortBy}. Sort order:${sortOrder}`);
+  response.set('Cache-Control', 'no-store, max-age=0');
+  const images = await getImages(sortBy, 10, sortOrder, page);
+  response.json(
+    images.map(
+      value => new FrontEndImage(request, value),
     ),
   );
 });
 
 // Image upload
-imagesRouter.post('/', async (req:any, res) => {
-  if (req.files === undefined) {
-    res.status(400).json({ status: 'error', error: 'File missing.' });
-  } else if (Array.isArray(req.files.file)) {
-    res.status(400).json({ status: 'error', error: 'Send one file at a time.' });
+imagesRouter.post('/', async (request, response) => {
+  if (request.files === undefined) {
+    response.status(400).json({status: 'error', error: 'File missing.'});
+  } else if (Array.isArray(request.files?.file)) {
+    response.status(400).json({status: 'error', error: 'Send one file at a time.'});
   } else {
-    let imageBuffer = req.files.file.data;
-    const imageName = req.files.file.name;
-    const imageType = await fileType.fromBuffer(imageBuffer);
+    let imageBuffer = request.files?.file.data;
+    const imageName = request.files?.file.name;
+
+    if (imageBuffer === undefined || imageName === undefined) {
+      response.status(400).json({status: 'error', error: 'Malformed file.'});
+      return;
+    }
+
+    const imageType = await fileTypeFromBuffer(imageBuffer);
     if (imageType === undefined) {
-      res.status(400).json({ status: 'error', error: 'Malformed file.' });
+      response.status(400).json({status: 'error', error: 'Malformed file.'});
       return;
     }
-    const { mime, ext } = imageType;
-    if (mime !== req.files.file.mimetype) {
-      res.status(400).json({ status: 'error', error: 'Malformed file.' });
+
+    const {mime, ext} = imageType;
+    if (mime !== request.files?.file.mimetype) {
+      response.status(400).json({status: 'error', error: 'Malformed file.'});
       return;
     }
+
     if (!ACCEPTED_MIME.includes(mime)) {
-      res.status(400).json({ status: 'error', error: 'Unsupported file type.' });
+      response.status(400).json({status: 'error', error: 'Unsupported file type.'});
     }
+
     if (mime === 'image/jpeg') {
-      // Strip exif from jpeg files and compress them with q=80
-      imageBuffer = await sharp(req.files.file.data).jpeg().toBuffer();
+      // Strip exif from jpeg files and compress them with q=95
+      imageBuffer = await sharp(imageBuffer).jpeg({quality: 95}).toBuffer();
     }
+
     try {
-      // hande images here
+      // Handle images here
       logger.verbose(`Got file ${imageName}`);
       const serverFileName = await addImage(imageBuffer, ext);
-      res.json(new FrontEndImage(req, serverFileName));
+      response.json(new FrontEndImage(request, serverFileName));
     } catch {
-      res.status(500).json({ status: 'error', error: 'Error saving uploaded image.' });
+      response.status(500).json({status: 'error', error: 'Error saving uploaded image.'});
     }
   }
 });

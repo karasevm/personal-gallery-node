@@ -1,22 +1,24 @@
 /** @jsxImportSource @emotion/react */
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Container,
-  Theme,
+  type Theme,
   Dialog,
   CircularProgress,
   IconButton,
   Snackbar,
   Grid,
   Typography,
-  Breakpoint,
+  type Breakpoint,
   useMediaQuery,
+  Grid2,
 } from '@mui/material';
-import { css } from '@emotion/react';
+import {css} from '@emotion/react';
 import InfiniteScroll from 'react-infinite-scroller';
-import axios from 'axios';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '@mui/styles';
+import axios, {isAxiosError} from 'axios';
+import {useTranslation} from 'react-i18next';
+import {useTheme} from '@mui/styles';
+import createBreakpoint from 'react-use/lib/factory/createBreakpoint';
 import * as imageService from './services/images';
 import * as settingsService from './services/settings';
 import * as loginService from './services/login';
@@ -24,7 +26,7 @@ import * as metaService from './services/meta';
 import * as userService from './services/user';
 import ImageGridListTile from './components/ImageGridList';
 import {
-  Config, Image, SortBy, SortOrder,
+  type Config, type Image, type SortBy, type SortOrder,
 } from './types';
 import PicturesAppBar from './components/PicturesAppBar';
 import UploadDialog from './components/UploadDialog';
@@ -33,22 +35,17 @@ import LoginView from './components/LoginView';
 import ConfirmationDialog from './components/ConfirmationDialog';
 import CredentialChangeDialog from './components/CredentialChangeDialog';
 
-function useWidth() {
-  const theme: Theme = useTheme();
-  const keys: readonly Breakpoint[] = [...theme.breakpoints.keys].reverse();
-  return (
-    keys.reduce((output: Breakpoint | null, key: Breakpoint) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const matches = useMediaQuery(theme.breakpoints.up(key));
-      return !output && matches ? key : output;
-    }, null) || 'xs'
-  );
-}
+const useBreakpoint = createBreakpoint({
+  6: 1200,
+  5: 900,
+  4: 600,
+  3: 0,
+});
 
 function App() {
   const [modalImage, setModalImage] = useState('');
   const [modalVideo, setModalVideo] = useState('');
-  const [imagesData, setImagesData] = useState<{ [key: number]: Image[]; }>({});
+  const [imagesData, setImagesData] = useState<Record<number, Image[]>>({});
   const imagesPage = useRef(0);
   const [hasMore, setHasMore] = useState(true);
   const [userSettings, setUserSettings] = useState<Config | undefined>(
@@ -127,22 +124,25 @@ function App() {
       verticalAlign: '-25%',
     }),
   };
-  const width = useWidth();
-  const { t } = useTranslation();
+  // Const width = useWidth();
+  const {t} = useTranslation();
 
   const widthMap = {
     xs: 3, sm: 4, md: 5, lg: 6, xl: 6,
   };
-  const cols = widthMap[width];
+  // Const cols = widthMap[width];
+  const cols = Number(useBreakpoint());
 
   useEffect(() => {
-    // imageService.getAll().then(result => setImagesData(result));
-    metaService.getMeta().then((result) => {
+    // ImageService.getAll().then(result => setImagesData(result));
+    metaService.getMeta().then(result => {
       setAcceptedUploadFiletypes(result.accepted);
       setSetupFinished(result.setupFinished);
       setUserSettings(settingsService.getSettings());
       setUserLoggedIn(settingsService.getUserState());
-    }).catch((e) => console.error(e));
+    }).catch((error: unknown) => {
+      console.error(error);
+    });
   }, []);
   const imageTileClickHandler = (url: string) => {
     if (/\.(mp4|webm)$/.test(url)) {
@@ -156,6 +156,7 @@ function App() {
     if (!clientOnly) {
       await loginService.doLogout();
     }
+
     setUserLoggedIn(false);
     setDragOpen(false);
     setConfirmDialogOpen(false);
@@ -174,21 +175,22 @@ function App() {
         userSettings?.sortBy,
         userSettings?.sortOrder,
       )
-      .then((result) => {
+      .then(result => {
         if (result.length === 0) {
           setHasMore(false);
         } else {
-          setImagesData((data) => ({ ...data, [page]: result }));
+          setImagesData(data => ({...data, [page]: result}));
         }
       })
-      .catch((e) => {
-        if (axios.isAxiosError(e)) {
-          if (e.response?.status === 401) {
+      .catch((error: unknown) => {
+        if (isAxiosError(error)) {
+          if (error.response?.status === 401) {
             void handleLogout(true);
             setNotification(t('Authorization error, please login'));
           } else {
             setNotification(t('Error getting image list from server'));
           }
+
           imagesPage.current -= 1;
         }
       });
@@ -203,43 +205,45 @@ function App() {
 
   const handleUpload = async (images: File[]) => {
     setDragOpen(false);
-    const promises = images.map(async (image) => imageService.uploadImage(image));
+    const promises = images.map(async image => imageService.uploadImage(image));
     try {
       const combinedResult = await Promise.all(promises);
       if (combinedResult.length > 0) {
-        setImagesData((data) => {
+        setImagesData(data => {
           if (data === undefined || Object.keys(data).length === 0) {
-            return { [-1]: combinedResult };
+            return {[-1]: combinedResult};
           }
+
           if (data[-1] === undefined || Object.keys(data[-1]).length === 0) {
-            return { ...data, [-1]: [...combinedResult] };
+            return {...data, [-1]: [...combinedResult]};
           }
-          return { ...data, [-1]: [...combinedResult, ...data[-1]] };
+
+          return {...data, [-1]: [...combinedResult, ...data[-1]]};
         });
       }
-    } catch (e) {
+    } catch {
       setNotification(t('Error uploading image'));
-      // refreshData();
+      // RefreshData();
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent) => {
-    if (e.clipboardData.items.length !== 0) {
-      Array.from(e.clipboardData.items).forEach((item) => {
+  const handlePaste = (event: React.ClipboardEvent) => {
+    if (event.clipboardData.items.length > 0) {
+      for (const item of Array.from(event.clipboardData.items)) {
         if (acceptedUploadFiletypes.includes(item.type)) {
           const pasteAsFile = item.getAsFile();
           if (pasteAsFile !== null) {
             void handleUpload([pasteAsFile]);
           }
         }
-      });
+      }
     }
   };
 
   const handleSettingsChange = (sortBy: SortBy, sortOrder: SortOrder) => {
-    setUserSettings({ ...userSettings, sortBy, sortOrder });
+    setUserSettings({...userSettings, sortBy, sortOrder});
     setConfigurationDialogOpen(false);
-    settingsService.saveSettings({ ...userSettings, sortBy, sortOrder });
+    settingsService.saveSettings({...userSettings, sortBy, sortOrder});
     setNotification(t('Settings changed'));
     refreshData();
   };
@@ -249,22 +253,30 @@ function App() {
       ? await loginService.doLogin(username, password)
       : await loginService.doRegister(username, password);
     switch (result) {
-      case 200:
+      case 200: {
         setUserLoggedIn(true);
         settingsService.setUserState(true);
         if (!setupFinished) {
           setSetupFinished(true);
         }
+
         break;
-      case 401:
+      }
+
+      case 401: {
         setNotification(t('Icorrect username or password'));
         break;
-      case 429:
+      }
+
+      case 429: {
         setNotification(t('Too many attempts, try again later'));
         break;
-      default:
+      }
+
+      default: {
         setNotification(t('Unknown error occured, try again later'));
         break;
+      }
     }
   };
 
@@ -274,7 +286,7 @@ function App() {
       await navigator.clipboard.writeText(key);
       setNotification(t('API token copied to clipboard'));
       setApiKey(key);
-    } catch (e) {
+    } catch {
       setNotification(t('Error getting API key'));
     }
   };
@@ -288,8 +300,8 @@ function App() {
       await userService.updateCredentials(oldPassword, username, password);
       void handleLogout();
       setNotification(t('Please login with your new credentials'));
-    } catch (e) {
-      if (axios.isAxiosError(e) && e?.response?.status === 401) {
+    } catch (error) {
+      if (isAxiosError(error) && error?.response?.status === 401) {
         setNotification(t('Check your old password and try again'));
       }
     }
@@ -297,22 +309,29 @@ function App() {
 
   if (userSettings === undefined || userLoggedIn === undefined) {
     return (
-      <Grid container justifyContent="center">
-        <CircularProgress css={styles.loader} />
-      </Grid>
+      <Grid2 container justifyContent='center'>
+        <CircularProgress css={styles.loader}/>
+      </Grid2>
     );
   }
+
   return (
     <div
       css={styles.root}
-      onDragEnter={() => setDragOpen(true)}
+      onDragEnter={() => {
+        setDragOpen(true);
+      }}
       onPaste={handlePaste}
     >
       {userLoggedIn ? (
         <>
           <PicturesAppBar
-            onUploadClick={() => setDragOpen(true)}
-            onSettingsClick={() => setConfigurationDialogOpen(true)}
+            onUploadClick={() => {
+              setDragOpen(true);
+            }}
+            onSettingsClick={() => {
+              setConfigurationDialogOpen(true);
+            }}
             onLogoutClick={handleLogout}
           />
           <Container>
@@ -321,119 +340,136 @@ function App() {
               pageStart={-1}
               hasMore={hasMore}
               loader={(
-                <Grid key="asdf" container justifyContent="center">
-                  <CircularProgress css={styles.loader} />
-                </Grid>
+                <Grid2 key='loader_grid' container justifyContent='center'>
+                  <CircularProgress css={styles.loader}/>
+                </Grid2>
               )}
             >
-              {typeof imagesData === 'object' && Object.keys(imagesData).length !== 0 ? (
+              {typeof imagesData === 'object' && Object.keys(imagesData).length > 0 ? (
                 <ImageGridListTile
+                // Sort and flatten the pages as we might have received them in any order
                   images={
                     [
                       ...new Set(Object.keys(imagesData)
                         .map(Number)
-                        .sort((a:number, b:number) => a - b)
-                        .reduce(
-                          (r: Image[], k) => (r.concat(imagesData[k])),
-                          [],
-                        ))]
-}
+                        .sort((a: number, b: number) => a - b)
+                        .flatMap((k: number) => imagesData[k]),
+                      ),
+                    ]
+                  }
                   cols={cols}
                   onTileClick={imageTileClickHandler}
                   onNotification={setNotification}
                 />
               ) : (
-                <Grid key="qwerty">
+                <Grid2 key='empty_grid'>
                   <div css={styles.placeholderIconContainer}>
-                    <span css={styles.placeholderIcon} className="material-icons-outlined">
+                    <span css={styles.placeholderIcon} className='material-icons-outlined'>
                       insert_photo
                     </span>
                   </div>
                   <Typography css={styles.placeholderText}>
                     {t('Upload your first image')}
                   </Typography>
-                </Grid>
+                </Grid2>
               )}
             </InfiniteScroll>
           </Container>
         </>
       ) : (
-        <LoginView onLogin={handleLogin} setupFinished={setupFinished} />
+        <LoginView isSetupFinished={setupFinished} onLogin={handleLogin}/>
       )}
 
       <Dialog
         open={modalImage !== '' || modalVideo !== ''}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+        maxWidth='lg'
         onClose={() => {
           setModalImage('');
           setModalVideo('');
         }}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="lg"
       >
-        {modalImage !== '' ? (
-          <img css={styles.dialogImage} src={modalImage} alt="" />
-        ) : null}
-        {modalVideo !== '' ? (
-          // eslint-disable-next-line jsx-a11y/media-has-caption
+        {modalImage === '' ? null : (
+          <img css={styles.dialogImage} src={modalImage} alt=''/>
+        )}
+        {modalVideo === '' ? null : (
           <video
-            css={styles.dialogImage}
             autoPlay
             controls
+            css={styles.dialogImage}
             src={modalVideo}
           />
-        ) : null}
+        )}
       </Dialog>
       <UploadDialog
         isOpen={dragOpen}
-        onClose={() => setDragOpen(false)}
-        onDrop={handleUpload}
         accept={acceptedUploadFiletypes}
+        onClose={() => {
+          setDragOpen(false);
+        }}
+        onDrop={handleUpload}
       />
       <ConfigurationDialog
-        open={configurationDialogOpen}
-        onDialogClose={() => setConfigurationDialogOpen(false)}
+        isOpen={configurationDialogOpen}
         currentSettings={userSettings}
-        onSave={handleSettingsChange}
-        onApiKeyChange={() => setConfirmDialogOpen(true)}
         apiKey={apiKey}
-        onCredentialsChange={() => setCredentialChangeDialogOpen(true)}
+        onDialogClose={() => {
+          setConfigurationDialogOpen(false);
+        }}
+        onSave={handleSettingsChange}
+        onApiKeyChange={() => {
+          setConfirmDialogOpen(true);
+        }}
+        onCredentialsChange={() => {
+          setCredentialChangeDialogOpen(true);
+        }}
       />
       <ConfirmationDialog
         header={t('Get new API key?')}
         content={t('This will invalidate your previous API key, continue?')}
-        open={confirmDialogOpen}
+        isOpen={confirmDialogOpen}
         onConfirm={() => {
           void handleApiKeyChange();
           setConfirmDialogOpen(false);
         }}
-        onCancel={() => setConfirmDialogOpen(false)}
+        onCancel={() => {
+          setConfirmDialogOpen(false);
+        }}
       />
       <CredentialChangeDialog
-        open={credentialChangeDialogOpen}
-        onDialogClose={() => setCredentialChangeDialogOpen(false)}
+        isOpen={credentialChangeDialogOpen}
+        onDialogClose={() => {
+          setCredentialChangeDialogOpen(false);
+        }}
         onCredentialsUpdate={handleCredentialsChange}
-        onNotification={(text) => setNotification(text)}
+        onNotification={text => {
+          setNotification(text);
+        }}
       />
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',
         }}
-        open={notification.length !== 0}
+        open={notification.length > 0}
         autoHideDuration={4000}
-        onClose={() => setNotification('')}
         message={notification}
         action={(
           <IconButton
-            size="small"
-            aria-label="close"
-            color="inherit"
-            onClick={() => setNotification('')}
+            size='small'
+            aria-label='close'
+            color='inherit'
+            onClick={() => {
+              setNotification('');
+            }}
           >
-            <span className="material-icons">close</span>
+            <span className='material-icons'>close</span>
           </IconButton>
         )}
+        onClose={() => {
+          setNotification('');
+        }}
       />
     </div>
   );

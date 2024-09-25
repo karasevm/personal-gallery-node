@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react';
+import {css} from '@emotion/react';
 import React from 'react';
 import {
   AppBar,
@@ -10,13 +10,13 @@ import {
   Typography,
   useScrollTrigger,
 } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 
-function PicturesAppBar({ onUploadClick, onSettingsClick, onLogoutClick }:
+function PicturesAppBar({onUploadClick, onSettingsClick, onLogoutClick}:
 {
-  onUploadClick: () => void;
-  onSettingsClick: () => void;
-  onLogoutClick: () => void;
+  readonly onUploadClick: () => void;
+  readonly onSettingsClick: () => void;
+  readonly onLogoutClick: () => void;
 }) {
   const trigger = useScrollTrigger();
   const styles = {
@@ -28,10 +28,10 @@ function PicturesAppBar({ onUploadClick, onSettingsClick, onLogoutClick }:
       flexGrow: 1,
     }),
   };
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   return (
     <>
-      <Slide appear={false} direction="down" in={!trigger}>
+      <Slide appear={false} direction='down' in={!trigger}>
         <AppBar>
           <Toolbar>
             {/* <IconButton
@@ -42,27 +42,31 @@ function PicturesAppBar({ onUploadClick, onSettingsClick, onLogoutClick }:
           >
             <MenuIcon />
           </IconButton> */}
-            <Typography variant="h6" css={styles.toolbarTitle}>
+            <Typography variant='h6' css={styles.toolbarTitle}>
               {t('Pictures')}
             </Typography>
-            <IconButton color="inherit" aria-label="upload" onClick={onUploadClick} size="large">
-              <span className="material-icons">cloud_upload</span>
+            <IconButton color='inherit' aria-label='upload' size='large' onClick={onUploadClick}>
+              <span className='material-icons'>cloud_upload</span>
             </IconButton>
             <IconButton
-              color="inherit"
-              aria-label="settings"
+              color='inherit'
+              aria-label='settings'
+              size='large'
               onClick={onSettingsClick}
-              size="large"
             >
-              <span className="material-icons">settings</span>
+              <span className='material-icons'>settings</span>
             </IconButton>
-            <Button color="inherit" onClick={() => onLogoutClick()}>
+            <Button
+              color='inherit' onClick={() => {
+                onLogoutClick();
+              }}
+            >
               {t('Logout')}
             </Button>
           </Toolbar>
         </AppBar>
       </Slide>
-      <Toolbar />
+      <Toolbar/>
     </>
   );
 }

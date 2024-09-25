@@ -1,33 +1,34 @@
-import express from 'express';
-import { getMeta, sessionExists } from './db';
+import type express from 'express';
+import {getMeta, sessionExists} from './db.js';
+import {isNonEmptyString} from './misc.js';
 
 export const requireAuth = (
-  req: express.Request,
-  res: express.Response,
+  request: express.Request,
+  response: express.Response,
   next: express.NextFunction,
 ) => {
   if (
-    req.headers.authorization
-    && req.headers.authorization.split(' ')[0] === 'Bearer'
+    request.headers.authorization
+    && request.headers.authorization.split(' ')[0] === 'Bearer'
+    && request.headers.authorization.split(' ')[1] === getMeta('apiToken')
   ) {
-    if (req.headers.authorization.split(' ')[1] === getMeta('apiToken')) {
-      next();
-      return;
-    }
+    next();
+    return;
   }
-  const token = req.cookies['personal-gallery_auth'];
-  if (sessionExists(token)) {
+
+  const token = request.cookies['personal-gallery_auth'] as unknown;
+  if (isNonEmptyString(token) && sessionExists(token)) {
     next();
   } else {
-    res.status(401).json({ error: 'Unauthorized' });
+    response.status(401).json({error: 'Unauthorized'});
   }
 };
 
 export const globalHeaders = (
-  _req: express.Request,
-  res: express.Response,
+  _request: express.Request,
+  response: express.Response,
   next: express.NextFunction,
 ) => {
-  res.set('Referrer-Policy', 'no-referrer');
+  response.set('Referrer-Policy', 'no-referrer');
   next();
 };

@@ -1,41 +1,46 @@
-import cacheManager from 'cache-manager';
-import redisStore from 'cache-manager-ioredis';
-import fsStore from 'cache-manager-fs-hash';
+import path from 'node:path';
+import {createCache} from 'cache-manager';
+import {Keyv} from 'keyv';
+import {Redis} from 'ioredis';
+import KeyvRedis from '@keyv/redis';
+import {KeyvSqlite} from '@keyv/sqlite';
 import {
-  REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, CACHE_DIR,
-} from './config';
-import logger from './logger';
+  REDIS_HOST, REDIS_PORT, REDIS_USERNAME, REDIS_PASSWORD, CACHE_DIR,
+} from './config.js';
+import logger from './logger.js';
 
 // eslint-disable-next-line import/no-mutable-exports
-let thumbnailCache: cacheManager.Cache;
+let thumbnailCache: ReturnType<typeof createCache>;
 
-if (typeof REDIS_HOST !== 'undefined') {
-  thumbnailCache = cacheManager.caching({
-    store: redisStore,
+if (REDIS_HOST !== undefined) {
+  // Define redis cache
+  const redis = new Redis({
     host: REDIS_HOST,
     port: REDIS_PORT,
+    username: REDIS_USERNAME,
     password: REDIS_PASSWORD,
     db: 0,
+  });
+  thumbnailCache = createCache({
+    stores: [new Keyv(new KeyvRedis(redis))],
     ttl: 60 * 60 * 24 * 365,
   });
-} else if (typeof CACHE_DIR !== 'undefined') {
-  thumbnailCache = cacheManager.caching({
-    store: fsStore,
-    ttl: 60 * 60 * 24 * 365, // time to life in seconds
-    options: {
-      path: CACHE_DIR, // path for cached files
-      subdirs: true, // create subdirectories to reduce the files in a single dir (default: false)
-      zip: false, // zip files to save diskspace (default: false)
-    },
+  logger.info(`Using cache store KeyvRedis on ${REDIS_HOST}:${REDIS_PORT}`);
+} else if (CACHE_DIR === undefined) {
+  // Define memory cache
+  thumbnailCache = createCache({
+    stores: [new Keyv()],
+    ttl: 60 * 60 * 24 * 365,
   });
+  logger.info('Using cache store memory');
 } else {
-  thumbnailCache = cacheManager.caching({
-    store: 'memory',
-    max: 300,
-    ttl: 604800,
+  // Define sqlite cache
+  const keyv = new Keyv(new KeyvSqlite(path.join(CACHE_DIR, 'thumbnails.sqlite')));
+  thumbnailCache = createCache({
+    stores: [keyv],
+    ttl: 60 * 60 * 24 * 365,
   });
+  logger.info(`Using cache store KeyvSqlite on ${path.join(CACHE_DIR, 'thumbnails.sqlite')}`);
 }
-
-logger.info(`Using cache store '${(thumbnailCache.store as any).name}'`);
 
 export default thumbnailCache;

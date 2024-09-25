@@ -1,25 +1,29 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/naming-convention */
+import path from 'node:path';
+import process from 'node:process';
 import sqlite3 from 'better-sqlite3';
-import path from 'path';
-import { DB_DIR } from './config';
-import { ImageDbEntry } from '../types';
-import logger from './logger';
+import {type ImageDatabaseEntry} from '../types.js';
+import {DB_DIR} from './config.js';
+import logger from './logger.js';
 
-export const db = sqlite3(
+export const database = sqlite3(
   process.env.NODE_ENV === 'test' ? ':memory:' : path.join(DB_DIR, 'app.db'),
 );
-logger.info(`Using db ${db.name}`);
-process.on('exit', () => db.close());
+logger.info(`Using db ${database.name}`);
+process.on('exit', () => database.close());
 process.on('SIGHUP', () => process.exit(128 + 1));
 process.on('SIGINT', () => process.exit(128 + 2));
 process.on('SIGTERM', () => process.exit(128 + 15));
 
-db.prepare(
+database.prepare(
   'CREATE TABLE IF NOT EXISTS images (id INTEGER PRIMARY KEY AUTOINCREMENT, filename TEXT UNIQUE, added INTEGER)',
 ).run();
-db.prepare(
+database.prepare(
   'CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, session TEXT)',
 ).run();
-db.prepare(
+database.prepare(
   'CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)',
 ).run();
 
@@ -33,15 +37,17 @@ export const insertImageIntoDB = (
   filename: string,
   addedTimestamp: number = Date.now(),
 ) => {
-  const result = db
+  const result = database
     .prepare('SELECT EXISTS(SELECT filename FROM images WHERE filename=?)')
     .get(filename);
   if (result['EXISTS(SELECT session FROM sessions WHERE session=?)'] === 1) {
     throw new Error('file already exists');
   }
-  const stmt = db.prepare('INSERT INTO images (filename,added) VALUES (?,?)');
+
+  const stmt = database.prepare('INSERT INTO images (filename,added) VALUES (?,?)');
   stmt.run(filename, addedTimestamp);
 };
+
 /**
  * Gets a list of images from the database according to the parameters
  * @param order Attribute by which images will be sorted
@@ -53,11 +59,11 @@ export const insertImageIntoDB = (
 export const getImagesFromDB = (
   order: 'added' | 'filename',
   orderDirection: 'ASC' | 'DESC',
-  limit: number = 10,
-  page: number = 0,
-): ImageDbEntry[] => {
+  limit = 10,
+  page = 0,
+): ImageDatabaseEntry[] => {
   logger.verbose(`${order}, ${orderDirection}, ${limit}, ${page}`);
-  const stmt = db.prepare(
+  const stmt = database.prepare(
     `SELECT * FROM images ORDER BY ${order} ${orderDirection} LIMIT ? OFFSET ?`,
   );
   return stmt.all(limit, page * limit);
@@ -68,7 +74,7 @@ export const getImagesFromDB = (
  * @param session Session to insert
  */
 export const insertSessionIntoDB = (session: string) => {
-  db.prepare('INSERT INTO sessions (session) VALUES (?)').run(session);
+  database.prepare('INSERT INTO sessions (session) VALUES (?)').run(session);
 };
 
 /**
@@ -76,7 +82,7 @@ export const insertSessionIntoDB = (session: string) => {
  * @param session Session to remove
  */
 export const removeSessionFromDB = (session: string) => {
-  db.prepare('DELETE FROM sessions WHERE session = (?)').run(session);
+  database.prepare('DELETE FROM sessions WHERE session = (?)').run(session);
 };
 
 /**
@@ -85,12 +91,13 @@ export const removeSessionFromDB = (session: string) => {
  * @returns true if exists, false otherwise
  */
 export const sessionExists = (session: string) => {
-  const result = db
+  const result = database
     .prepare('SELECT EXISTS(SELECT session FROM sessions WHERE session=?)')
     .get(session);
   if (result['EXISTS(SELECT session FROM sessions WHERE session=?)'] === 1) {
     return true;
   }
+
   return false;
 };
 
@@ -98,7 +105,7 @@ export const sessionExists = (session: string) => {
  * Removes all sessions from the sessions table
  */
 export const clearSessionsDB = () => {
-  db.prepare('DELETE FROM sessions').run();
+  database.prepare('DELETE FROM sessions').run();
 };
 
 // Meta - key value store backed by a sqlite table
@@ -107,18 +114,18 @@ export const clearSessionsDB = () => {
  * Sets a meta value
  */
 export const setMeta = (key: string, value: string) => {
-  db.prepare('REPLACE INTO meta (key, value) values (?,?)').run(key, value);
+  database.prepare('REPLACE INTO meta (key, value) values (?,?)').run(key, value);
 };
 
 /**
  * Gets a meta value
  * @returns Value assigned to key, undefined otherwise
  */
-export const getMeta = (key: string) => db.prepare('SELECT value FROM meta WHERE key = ?').get(key)?.value;
+export const getMeta = (key: string) => database.prepare('SELECT value FROM meta WHERE key = ?').get(key)?.value;
 
 /**
  * Deletes a meta key value pair
  */
 export const deleteMeta = (key: string) => {
-  db.prepare('DELETE FROM meta WHERE key = ?').run(key);
+  database.prepare('DELETE FROM meta WHERE key = ?').run(key);
 };

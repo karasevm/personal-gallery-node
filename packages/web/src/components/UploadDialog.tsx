@@ -1,21 +1,21 @@
-/* eslint-disable react/jsx-props-no-spreading */
+
 /** @jsxImportSource @emotion/react */
 import React from 'react';
 import {
-  Dialog, DialogTitle, IconButton, Theme,
+  Dialog, DialogTitle, IconButton, type Theme,
 } from '@mui/material';
-import { css } from '@emotion/react';
-import { useDropzone } from 'react-dropzone';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '@mui/styles';
+import {css} from '@emotion/react';
+import {useDropzone} from 'react-dropzone';
+import {useTranslation} from 'react-i18next';
+import {useTheme} from '@mui/styles';
 
 function UploadDialog({
   isOpen, onClose, onDrop, accept,
-}:{
-  isOpen: boolean;
-  onClose: () => void;
-  onDrop: (files: File[]) => void;
-  accept: string[];
+}: {
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly onDrop: (files: File[]) => void;
+  readonly accept: string[];
 }) {
   const theme: Theme = useTheme();
   const styles = {
@@ -48,7 +48,7 @@ function UploadDialog({
       color: theme.palette.grey[500],
     }),
   };
-  const { t } = useTranslation();
+  const {t} = useTranslation();
 
   const {
     getRootProps,
@@ -57,27 +57,28 @@ function UploadDialog({
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    onDropAccepted: (acceptedFiles) => onDrop(acceptedFiles),
+    onDropAccepted(acceptedFiles) {
+      onDrop(acceptedFiles);
+    },
     accept,
   });
   return (
     <Dialog
       open={isOpen}
+      aria-describedby='alert-dialog-description'
+      maxWidth='xl'
+      aria-labelledby='alert-dialog-title'
       onClose={onClose}
-      // onDragLeave={() => setDragOpen(false)}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-      maxWidth="xl"
     >
-      <DialogTitle id="alert-dialog-title">
+      <DialogTitle id='alert-dialog-title'>
         {t('Upload')}
         <IconButton
-          aria-label="close"
+          aria-label='close'
           css={styles.closeButton}
+          size='large'
           onClick={onClose}
-          size="large"
         >
-          <span className="material-icons">close</span>
+          <span className='material-icons'>close</span>
         </IconButton>
       </DialogTitle>
       <section>
@@ -86,11 +87,12 @@ function UploadDialog({
             css: [
               styles.dropzone,
               isDragAccept ? styles.accept : null,
-              isDragReject ? styles.reject : null],
+              isDragReject ? styles.reject : null,
+            ],
             className: 'dropzone ',
           })}
         >
-          <input {...getInputProps()} />
+          <input {...getInputProps()}/>
           <span css={styles.icon}>
             {isDragActive ? null : '📁'}
             {isDragAccept ? '📂' : null}

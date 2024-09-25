@@ -1,19 +1,19 @@
-export interface Image {
+export type Image = {
   filename: string;
-  imagebuffer: Buffer;
+  imagebuffer: Uint8Array;
   filetype: string;
-}
+};
 
-export interface ImageDbEntry {
+export type ImageDatabaseEntry = {
   id: number;
   filename: string;
   added: number;
-}
+};
 
-export interface ThumbnailMeta {
+export type ThumbnailMeta = {
   filetype: string;
   url: string;
-}
+};
 
 export enum SortBy {
   Name = 'filename',
@@ -25,7 +25,7 @@ export enum SortOrder {
   Descending = 'DESC',
 }
 
-export interface Config {
+export type Config = {
   sortBy: SortBy;
   sortOrder: SortOrder;
-}
+};

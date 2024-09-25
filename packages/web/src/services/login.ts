@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { API_BASE_URL } from '../consts';
+import axios, {isAxiosError} from 'axios';
+import {API_BASE_URL} from '../consts';
 
 /**
  *
@@ -12,22 +12,23 @@ export const doLogin = async (
   password: string,
 ): Promise<number> => {
   try {
-    const { status } = await axios.post(
+    const {status} = await axios.post(
       `${API_BASE_URL}/login`,
       {
         username,
         password,
       },
       {
-        validateStatus: (statusCode) => statusCode >= 200 && statusCode < 500,
+        validateStatus: statusCode => statusCode >= 200 && statusCode < 500,
       },
     );
     return status;
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      console.error(e);
-      return e?.response?.status || 500;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error);
+      return error?.response?.status ?? 500;
     }
+
     return 500;
   }
 };
@@ -37,22 +38,23 @@ export const doRegister = async (
   password: string,
 ): Promise<number> => {
   try {
-    const { status } = await axios.post(
+    const {status} = await axios.post(
       `${API_BASE_URL}/login/register`,
       {
         username,
         password,
       },
       {
-        validateStatus: (statusCode) => statusCode >= 200 && statusCode < 500,
+        validateStatus: statusCode => statusCode >= 200 && statusCode < 500,
       },
     );
     return status;
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      console.error(e);
-      return e?.response?.status || 500;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error);
+      return error?.response?.status ?? 500;
     }
+
     return 500;
   }
 };
@@ -60,7 +62,7 @@ export const doRegister = async (
 export const doLogout = async () => {
   try {
     await axios.post(`${API_BASE_URL}/login/logout`);
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
   }
 };

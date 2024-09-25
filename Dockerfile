@@ -1,4 +1,4 @@
-FROM node:lts-alpine as frontend-build
+FROM node:lts-alpine AS frontend-build
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY ./ /app
 RUN  yarn workspaces focus web \
   && yarn workspace web build
 
-FROM node:lts-bullseye
+FROM node:lts-bullseye-slim
 
 WORKDIR /app
 

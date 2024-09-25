@@ -1,17 +1,24 @@
 /** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react'; import {
-  AppBar, Button, Grid, TextField, Theme, Toolbar, Typography,
+import {css} from '@emotion/react';
+import {
+  AppBar,
+  Button,
+  Grid,
+  TextField,
+  type Theme,
+  Toolbar,
+  Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '@mui/styles';
+import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useTheme} from '@mui/styles';
 
-function LoginView({ onLogin, setupFinished }:
+function LoginView({onLogin, isSetupFinished: setupFinished}:
 {
-  onLogin: (username: string, password: string) => void;
-  setupFinished: boolean;
+  readonly onLogin: (username: string, password: string) => void;
+  readonly isSetupFinished: boolean;
 }) {
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const theme: Theme = useTheme();
   const styles = {
     margin: css({
@@ -26,57 +33,61 @@ function LoginView({ onLogin, setupFinished }:
   const [password, setPassword] = useState('');
 
   return (
-    <div className="App">
-      <AppBar position="static">
+    <div className='App'>
+      <AppBar position='static'>
         <Toolbar>
-          <Typography variant="h6">{t('Pictures')}</Typography>
+          <Typography variant='h6'>{t('Pictures')}</Typography>
         </Toolbar>
       </AppBar>
       <Grid
         container
         spacing={0}
-        alignItems="center"
-        justifyContent="center"
-        style={{ minHeight: '80vh' }}
+        alignItems='center'
+        justifyContent='center'
+        style={{minHeight: '80vh'}}
       >
         <Grid item xs={8} md={6}>
-          <Typography variant="h3" css={styles.header}>
+          <Typography variant='h3' css={styles.header}>
             {setupFinished ? t('Login') : t('Register')}
           </Typography>
           <form
-            onSubmit={(e: React.FormEvent) => {
-              e.preventDefault();
+            onSubmit={(event: React.FormEvent) => {
+              event.preventDefault();
               onLogin(username, password);
             }}
           >
             <TextField
-              id="outlined-username-input"
-              label={t('Username')}
               fullWidth
-              type="text"
+              id='outlined-username-input'
+              label={t('Username')}
+              type='text'
               autoComplete={setupFinished ? 'current-username' : 'new-username'}
-              variant="outlined"
+              variant='outlined'
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
               css={styles.margin}
+              onChange={event => {
+                setUsername(event.target.value);
+              }}
             />
             <TextField
-              id="outlined-password-input"
-              label={t('Password')}
               fullWidth
-              type="password"
+              id='outlined-password-input'
+              label={t('Password')}
+              type='password'
               autoComplete={setupFinished ? 'current-password' : 'new-password'}
-              variant="outlined"
+              variant='outlined'
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
               css={styles.margin}
+              onChange={event => {
+                setPassword(event.target.value);
+              }}
             />
             <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              css={styles.margin}
               fullWidth
+              variant='contained'
+              color='primary'
+              type='submit'
+              css={styles.margin}
             >
               {setupFinished ? t('Login') : t('Register')}
             </Button>

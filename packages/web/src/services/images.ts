@@ -1,9 +1,9 @@
 import axios from 'axios';
 import {
-  Image, SortBy, SortOrder, Thumbnail,
+  type Image, SortBy, SortOrder, type Thumbnail,
 } from '../types';
-import { API_BASE_URL } from '../consts';
-import { hasKey } from './common';
+import {API_BASE_URL} from '../consts';
+import {hasKey} from './common';
 
 // Type guards
 const isThumbnail = (thumb: unknown): thumb is Thumbnail => {
@@ -17,11 +17,12 @@ const isThumbnail = (thumb: unknown): thumb is Thumbnail => {
   ) {
     return true;
   }
+
   return false;
 };
 
 const isThumbnailArray = (thumbnails: unknown): thumbnails is Thumbnail[] => (
-  Array.isArray(thumbnails) && thumbnails.every(isThumbnail)
+  Array.isArray(thumbnails) && thumbnails.every(thumbnail => isThumbnail(thumbnail))
 );
 
 const isImage = (image: unknown): image is Image => {
@@ -37,11 +38,12 @@ const isImage = (image: unknown): image is Image => {
   ) {
     return true;
   }
+
   return false;
 };
 
 const isImageArray = (images: unknown): images is Image[] => (
-  Array.isArray(images) && images.every(isImage)
+  Array.isArray(images) && images.every(image => isImage(image))
 );
 
 /**
@@ -50,6 +52,7 @@ const isImageArray = (images: unknown): images is Image[] => (
  * @param sortOrder Images sort direction
  * @param page Page number
  * @return List of images
+ * @throws Will throw if malformed response is received
  */
 export const getPage = async (
   page = 0,
@@ -57,12 +60,13 @@ export const getPage = async (
   sortOrder: SortOrder = SortOrder.Descending,
 ): Promise<Image[]> => {
   const response = await axios.get(`${API_BASE_URL}/images`, {
-    params: { page, sortBy, sortOrder },
+    params: {page, sortBy, sortOrder},
     timeout: 5000,
   });
   if (isImageArray(response?.data)) {
     return response.data;
   }
+
   throw new Error('Malformed response from server');
 };
 
@@ -79,10 +83,11 @@ export const uploadImage = async (image: File): Promise<Image> => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
-    timeout: 10000,
+    timeout: 10_000,
   });
   if (isImage(response?.data)) {
     return response.data;
   }
+
   throw new Error('Malformed response from server');
 };

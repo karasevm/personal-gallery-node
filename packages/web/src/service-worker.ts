@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-restricted-globals */
+
 /// <reference lib="webworker" />
 
 // This service worker can be customized!
@@ -12,11 +11,11 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
-import { clientsClaim } from 'workbox-core';
-import { ExpirationPlugin } from 'workbox-expiration';
-import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
-import { registerRoute } from 'workbox-routing';
-import { CacheFirst, NetworkFirst, Strategy } from 'workbox-strategies';
+import {clientsClaim} from 'workbox-core';
+import {ExpirationPlugin} from 'workbox-expiration';
+import {precacheAndRoute, createHandlerBoundToURL} from 'workbox-precaching';
+import {registerRoute} from 'workbox-routing';
+import {CacheFirst, NetworkFirst, Strategy} from 'workbox-strategies';
 
 declare const self: ServiceWorkerGlobalScope;
 clientsClaim();
@@ -33,7 +32,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 const fileExtensionRegexp = /\/[^/?]+\.[^/]+$/;
 registerRoute(
   // Return false to exempt requests from being fulfilled by index.html.
-  ({ request, url }: { request: Request; url: URL }) => {
+  ({request, url}: {request: Request; url: URL}) => {
     // If this isn't a navigation, skip.
     if (request.mode !== 'navigate') {
       return false;
@@ -46,7 +45,7 @@ registerRoute(
 
     // If this looks like a URL for a resource, because it contains
     // a file extension, skip.
-    if (url.pathname.match(fileExtensionRegexp)) {
+    if (fileExtensionRegexp.test(url.pathname)) {
       return false;
     }
 
@@ -57,58 +56,58 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }) => url.origin === self.location.origin && url.pathname.includes('/api/thumbnails/'),
+  ({url}) => url.origin === self.location.origin && url.pathname.includes('/api/thumbnails/'),
   new CacheFirst({
     cacheName: 'thumbnails',
     plugins: [
-      new ExpirationPlugin({ maxEntries: 50 }),
+      new ExpirationPlugin({maxEntries: 50}),
     ],
   }),
 );
 
 registerRoute(
-  ({ url }) => /^\/\w+\.(mp4|webm|png|webp|gif|avif|jpeg|jpg)/gm.test(url.pathname),
+  ({url}) => /^\/\w+\.(mp4|webm|png|webp|gif|avif|jpeg|jpg)/gm.test(url.pathname),
   new CacheFirst({
     cacheName: 'fulls',
     plugins: [
-      new ExpirationPlugin({ maxEntries: 30 }),
+      new ExpirationPlugin({maxEntries: 30}),
     ],
   }),
 );
 
 registerRoute(
-  ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.json'),
+  ({url}) => url.origin === self.location.origin && url.pathname.endsWith('.json'),
   new CacheFirst({
     cacheName: 'json',
   }),
 );
 
 registerRoute(
-  ({ url }) => url.origin === self.location.origin && (url.pathname.includes('/api/images') || url.pathname.includes('/api/meta')),
+  ({url}) => url.origin === self.location.origin && (url.pathname.includes('/api/images') || url.pathname.includes('/api/meta')),
   new NetworkFirst({
     cacheName: 'imageData',
   }),
 );
 
 class MyStrategy extends Strategy {
-  // eslint-disable-next-line class-methods-use-this
-  async _handle(request: any, handler: { fetch: (arg0: any) => any; }) {
+  async _handle(request: any, handler: {fetch: (argument0: any) => any}) {
     if (request.mode === 'navigate') {
       await handler.fetch(request);
       return Response.redirect('/', 302);
     }
+
     return handler.fetch(request);
   }
 }
 
 registerRoute(
-  ({ url }) => url.origin === self.location.origin && url.pathname.includes('/api/images'),
+  ({url}) => url.origin === self.location.origin && url.pathname.includes('/api/images'),
   new MyStrategy(),
   'POST',
 );
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
-self.addEventListener('message', (event) => {
+self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }

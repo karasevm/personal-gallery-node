@@ -1,64 +1,82 @@
-import { Router } from 'express';
-import * as authService from '../services/authService';
-import { isSetupFinished, isNonEmptyString } from '../utils/misc';
+import process from 'node:process';
+import {Router} from 'express';
+import * as authService from '../services/authService.js';
+import {isSetupFinished, isNonEmptyString} from '../utils/misc.js';
 
 const loginRouter = Router();
 
-loginRouter.post('/', async (req, res) => {
+loginRouter.post('/', async (request, response) => {
   if (!isSetupFinished()) {
-    res.status(500).json({ status: 'error' });
+    response.status(500).json({status: 'error'});
     return;
   }
-  const { username, password } = req.body;
+
+  const {username, password} = request.body as {username: unknown; password: unknown};
+  if (!isNonEmptyString(username) || !isNonEmptyString(password)) {
+    response.status(400).send({status: 'error'});
+    return;
+  }
+
   const result = await authService.login(username, password);
-  if (result !== null) {
-    res.cookie('personal-gallery_auth', result, {
+  if (result === null) {
+    response.status(401).send({status: 'error'});
+  } else {
+    response.cookie('personal-gallery_auth', result, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       expires: new Date(new Date().setFullYear(new Date().getFullYear() + 3)),
     });
-    res.status(200).json({ status: 'success' });
-  } else {
-    res.status(401).send({ status: 'error' });
+    response.status(200).json({status: 'success'});
   }
 });
 
-loginRouter.post('/register', async (req, res) => {
+loginRouter.post('/register', async (request, response) => {
   if (isSetupFinished()) {
-    res.status(403).json({ status: 'already_registered' });
+    response.status(403).json({status: 'already_registered'});
     return;
   }
-  const { username, password } = req.body;
+
+  const {username, password} = request.body as {username: unknown; password: unknown};
   if (!isNonEmptyString(username) || !isNonEmptyString(password)) {
-    res.status(400).send({ status: 'error' });
+    response.status(400).send({status: 'error'});
     return;
   }
+
+  if (!isNonEmptyString(username) || !isNonEmptyString(password)) {
+    response.status(400).send({status: 'error'});
+    return;
+  }
+
   await authService.register(username, password);
   const result = await authService.login(username, password);
-  if (result !== null) {
-    res.cookie('personal-gallery_auth', result, {
+  if (result === null) {
+    response.status(500).send({status: 'error'});
+  } else {
+    response.cookie('personal-gallery_auth', result, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' && req.protocol === 'https',
+      secure: process.env.NODE_ENV === 'production' && request.protocol === 'https',
       sameSite: 'strict',
       expires: new Date(new Date().setFullYear(new Date().getFullYear() + 3)),
     });
-    res.status(200).json({ status: 'success' });
-  } else {
-    res.status(500).send({ status: 'error' });
+    response.status(200).json({status: 'success'});
   }
 });
 
-loginRouter.post('/logout', async (req, res) => {
-  authService.logout(req.cookies['personal-gallery_auth']);
-  res.cookie('personal-gallery_auth', '', {
+loginRouter.post('/logout', async (request, response) => {
+  const token = request.cookies['personal-gallery_auth'] as unknown;
+  if (isNonEmptyString(token)) {
+    void authService.logout(token);
+  }
+
+  response.cookie('personal-gallery_auth', '', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' && req.protocol === 'https',
+    secure: process.env.NODE_ENV === 'production' && request.protocol === 'https',
     sameSite: 'strict',
     expires: new Date(0),
   });
-  res.set('Clear-Site-Data', '"cache", "cookies", "storage"');
-  res.status(200).json({ status: 'success' });
+  response.set('Clear-Site-Data', '"cache", "cookies", "storage"');
+  response.status(200).json({status: 'success'});
 });
 
 export default loginRouter;

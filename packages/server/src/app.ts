@@ -1,22 +1,22 @@
+import process from 'node:process';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import fileUpload from 'express-fileupload';
-import fileType from 'file-type';
-import thumbnailsRouter from './routes/thumbnails';
-import imagesRouter from './routes/images';
-import metaRouter from './routes/meta';
-import loginRouter from './routes/login';
-import userRouter from './routes/user';
-import { getImage, registerFileInFolder } from './services/imageService';
-import { requireAuth } from './utils/middlewares';
-import { register } from './services/authService';
-import logger from './utils/logger';
-
-import * as config from './utils/config';
-import { isNonEmptyString } from './utils/misc';
+import {fileTypeFromBuffer} from 'file-type';
+import thumbnailsRouter from './routes/thumbnails.js';
+import imagesRouter from './routes/images.js';
+import metaRouter from './routes/meta.js';
+import loginRouter from './routes/login.js';
+import userRouter from './routes/user.js';
+import {getImage, registerFileInFolder} from './services/imageService.js';
+import {requireAuth} from './utils/middlewares.js';
+import {register} from './services/authService.js';
+import logger from './utils/logger.js';
+import * as config from './utils/config.js';
+import {isNonEmptyString} from './utils/misc.js';
 
 const app = express();
 if (process.env.NODE_ENV === 'dev') {
@@ -29,12 +29,12 @@ if (process.env.NODE_ENV === 'dev') {
 const rateLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 10,
-  handler: (_req, res) => {
-    res.status(429).json({ status: 'ratelimit' });
+  handler(_request, response) {
+    response.status(429).json({status: 'ratelimit'});
   },
-  onLimitReached: (req) => logger.warn(`${req.ip} hit rate limit`),
+  onLimitReached: request => logger.warn(`${request.ip} hit rate limit`),
 });
-// const speedLimiter = slowDown({
+// Const speedLimiter = slowDown({
 //   windowMs: 60 * 1000, // 15 minutes
 //   delayAfter: 2, // allow 100 requests per 15 minutes, then...
 //   delayMs: 100, // begin adding 500ms of delay per request above 100:
@@ -42,7 +42,7 @@ const rateLimiter = rateLimit({
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 app.set('trust proxy', config.PROXY);
 
 app.use(express.static('public'));
@@ -51,24 +51,27 @@ app.use('/api/thumbnails', requireAuth, thumbnailsRouter);
 app.use('/api/meta', metaRouter);
 app.use('/api/login', rateLimiter, loginRouter);
 app.use('/api/user', requireAuth, userRouter);
-app.get('/:id', async (req, res) => {
+app.get('/:id', async (request, response) => {
   try {
-    const buffer = (await getImage(req.params.id)).imagebuffer;
-    const imageType = await fileType.fromBuffer(buffer);
+    const image = await getImage(request.params.id);
+    const buffer = image.imagebuffer;
+    const imageType = await fileTypeFromBuffer(buffer);
     if (imageType === undefined) {
-      res.redirect('/');
+      response.redirect('/');
       return;
     }
-    const { mime } = imageType;
-    res.type(mime);
-    res.end(buffer, 'binary');
-  } catch (err) {
-    res.redirect('/');
+
+    const {mime} = imageType;
+    response.type(mime);
+    response.end(buffer, 'binary');
+  } catch {
+    response.redirect('/');
   }
 });
-registerFileInFolder();
+void registerFileInFolder();
 if (isNonEmptyString(config.USERNAME) && isNonEmptyString(config.PASSWORD)) {
   logger.warn('Using credentials passend in the environment, sessions cleared');
-  register(config.USERNAME, config.PASSWORD);
+  void register(config.USERNAME, config.PASSWORD);
 }
+
 export default app;

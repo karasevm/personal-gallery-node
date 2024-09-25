@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
 import React from 'react';
-import { css } from '@emotion/react';
-import { ImageList, ImageListItem } from '@mui/material';
-import { Image } from '../types';
+import {css} from '@emotion/react';
+import {ImageList, ImageListItem} from '@mui/material';
+import {type Image} from '../types';
 import ImageThumbnail from './ImageThumbnail';
 
 function ImageGridListTile({
@@ -10,15 +10,15 @@ function ImageGridListTile({
   cols,
   onTileClick,
   onNotification,
-}:{
-  images: Image[];
-  cols: number;
-  onTileClick: (url: string) => void;
-  onNotification: (text: string) => void;
+}: {
+  readonly images: Image[];
+  readonly cols: number;
+  readonly onTileClick: (url: string) => void;
+  readonly onNotification: (text: string) => void;
 }) {
   return (
-    <ImageList css={css({ margin: 0, overflowY: 'hidden' })} rowHeight={160} cols={cols}>
-      {images.map((image) => (
+    <ImageList css={css({margin: 0, overflowY: 'hidden'})} rowHeight={160} cols={cols}>
+      {images.map(image => (
         <ImageListItem key={image.filename}>
           <ImageThumbnail
             image={image}
@@ -31,12 +31,13 @@ function ImageGridListTile({
   );
 }
 
-export default React.memo(ImageGridListTile, (prevProps, nextProps) => {
+export default React.memo(ImageGridListTile, (previousProperties, nextProperties) => {
   if (
-    prevProps.images.length === nextProps.images.length
-    && prevProps.cols === nextProps.cols
+    previousProperties.images.length === nextProperties.images.length
+    && previousProperties.cols === nextProperties.cols
   ) {
     return true;
   }
+
   return false;
 });

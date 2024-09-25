@@ -1,9 +1,9 @@
 /** @jsxImportSource @emotion/react */
-import { ButtonBase, ImageListItemBar, IconButton } from '@mui/material';
-import { css } from '@emotion/react';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Image } from '../types';
+import {ButtonBase, ImageListItemBar, IconButton} from '@mui/material';
+import {css} from '@emotion/react';
+import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {type Image} from '../types';
 
 const styles = {
   image: css({
@@ -47,17 +47,18 @@ const styles = {
   }),
 };
 
-function ImageThumbnail({ image, onTileClick, onNotification }:{
-  image: Image;
-  onTileClick: (url: string) => void;
-  onNotification: (text: string) => void;
+function ImageThumbnail({image, onTileClick, onNotification}: {
+  readonly image: Image;
+  readonly onTileClick: (url: string) => void;
+  readonly onNotification: (text: string) => void;
 }) {
   const [loaded, setLoaded] = useState(false);
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const copyToClipboard = async (stringToCopy: string) => {
     await navigator.clipboard.writeText(stringToCopy);
     onNotification(t('Copied link to clipboard'));
   };
+
   return (
     <div css={styles.container}>
       <div css={[styles.item, loaded ? styles.fadeIn : null]}>
@@ -65,13 +66,13 @@ function ImageThumbnail({ image, onTileClick, onNotification }:{
           <a
             href={image.url}
             css={styles.link}
-            onClick={(e: React.MouseEvent) => {
-              e.preventDefault();
+            onClick={(event: React.MouseEvent) => {
+              event.preventDefault();
               onTileClick(image.url);
             }}
           >
             <picture>
-              {image.thumbnails.map((thumb) => (
+              {image.thumbnails.map(thumb => (
                 <source
                   key={encodeURI(thumb.url)}
                   srcSet={encodeURI(thumb.url)}
@@ -79,36 +80,38 @@ function ImageThumbnail({ image, onTileClick, onNotification }:{
                 />
               ))}
               <img
-                loading="lazy"
+                loading='lazy'
                 css={styles.image}
                 src={
-                  image.thumbnails.filter(
-                    (thumb) => thumb.filetype === 'image/jpeg',
-                  )[0].url
+                  image.thumbnails.find(
+                    thumb => thumb.filetype === 'image/jpeg',
+                  )?.url
                 }
-                alt=""
-                onLoad={() => setLoaded(true)}
+                alt=''
+                onLoad={() => {
+                  setLoaded(true);
+                }}
               />
             </picture>
           </a>
         </ButtonBase>
         <ImageListItemBar
-          position="top"
+          position='top'
           actionIcon={(
             <IconButton
               css={styles.icon}
+              size='large'
               onClick={() => {
                 void copyToClipboard(
                   `${window.location.href.replace(/\/$/, '')}${image.url}`,
                 );
               }}
-              size="large"
             >
               {/* <FileCopyOutlinedIcon /> */}
-              <span className="material-icons">content_copy</span>
+              <span className='material-icons'>content_copy</span>
             </IconButton>
           )}
-          actionPosition="left"
+          actionPosition='left'
           css={styles.titleBar}
         />
       </div>

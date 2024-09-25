@@ -1,7 +1,7 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
-import * as db from '../utils/db';
-import { validateCredentials } from '../utils/authorization';
+import * as db from '../utils/db.js';
+import {validateCredentials} from '../utils/authorization.js';
 
 /**
  * Checks for username and password validity,
@@ -15,6 +15,7 @@ export const login = async (username: string, password: string) => {
     db.insertSessionIntoDB(token);
     return token;
   }
+
   return null;
 };
 
@@ -32,7 +33,7 @@ export const generateToken = async () => {
  */
 export const clearSessions = async () => {
   db.clearSessionsDB();
-  generateToken();
+  await generateToken();
 };
 
 /**
@@ -49,7 +50,7 @@ export const logout = async (token: string) => {
  * @param {string} password Plaintext password
  */
 export const register = async (username: string, password: string) => {
-  clearSessions();
+  void clearSessions();
   db.setMeta('username', username);
   db.setMeta('password', await bcrypt.hash(password, 12));
 };

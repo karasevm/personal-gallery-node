@@ -1,0 +1,10 @@
+{
+  "preset": "ts-jest",
+  "resolver": "ts-jest-resolver",
+  "testEnvironment": "node",
+  "maxWorkers": 1,
+  "transform": {
+    "^.+\\.(t|j)sx?$": "@swc/jest"
+  },
+  "extensionsToTreatAsEsm": [".ts", ".tsx"]
+}

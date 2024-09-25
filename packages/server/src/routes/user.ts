@@ -1,39 +1,48 @@
-import { Router } from 'express';
-import * as authService from '../services/authService';
-import { isNonEmptyString } from '../utils/misc';
-import { validatePassword } from '../utils/authorization';
+import {Router} from 'express';
+import * as authService from '../services/authService.js';
+import {isNonEmptyString} from '../utils/misc.js';
+import {validatePassword} from '../utils/authorization.js';
 
 const userRouter = Router();
 
-userRouter.post('/getApiKey', async (req, res) => {
+userRouter.post('/getApiKey', async (_, response) => {
   const token = await authService.generateToken();
-  res.json({ token });
+  response.json({token});
 });
 
-userRouter.post('/updateCredentials', async (req, res) => {
-  const { username, password, oldPassword } = req.body;
+userRouter.post('/updateCredentials', async (request, response) => {
+  const {username, password, oldPassword} = request.body as {
+    username: unknown;
+    password: unknown;
+    oldPassword: unknown;
+  };
+
   if (
-    (typeof username !== 'undefined' && !isNonEmptyString(username))
-    || (typeof password !== 'undefined' && !isNonEmptyString(password))
+    (username !== undefined && !isNonEmptyString(username))
+    || (password !== undefined && !isNonEmptyString(password))
   ) {
-    res.status(400).send({ status: 'error' });
+    response.status(400).send({status: 'error'});
     return;
   }
+
   if (
     !isNonEmptyString(oldPassword)
     || !(await validatePassword(oldPassword))
   ) {
-    res.status(401).send({ status: 'error' });
+    response.status(401).send({status: 'error'});
     return;
   }
-  if (typeof username !== 'undefined') {
+
+  if (username !== undefined) {
     await authService.updateUsername(username);
   }
-  if (typeof password !== 'undefined') {
+
+  if (password !== undefined) {
     await authService.updatePassword(password);
   }
+
   await authService.clearSessions();
-  res.json({ status: 'success' });
+  response.json({status: 'success'});
 });
 
 export default userRouter;

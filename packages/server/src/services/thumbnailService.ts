@@ -1,12 +1,12 @@
-/* eslint-disable import/prefer-default-export */
+import {promises as fs} from 'node:fs';
+import path from 'node:path';
 import sharp from 'sharp';
 import ffmpeg from 'fluent-ffmpeg';
 import tmp from 'tmp';
-import { promises as fs } from "fs";
-import path from 'path';
-import { FFMPEG_EXISTS, IMAGE_DIR } from '../utils/config';
-import { getImage } from './imageService';
-import logger from '../utils/logger';
+import {FFMPEG_EXISTS, IMAGE_DIR} from '../utils/config.js';
+import logger from '../utils/logger.js';
+import {isNonEmptyString} from '../utils/misc.js';
+import {getImage} from './imageService.js';
 
 /**
  * Promisified fluent-ffmpeg screenshots call
@@ -14,10 +14,10 @@ import logger from '../utils/logger';
  * @param folder path to the output folder
  * @returns a promise with an array of created filenames
  */
-const ffmpegScreenshotPromise = (
+const ffmpegScreenshotPromise = async (
   filepath: string,
   folder: string,
-): Promise<string[]> => new Promise((resolve) => {
+): Promise<string[]> => new Promise(resolve => {
   const ffmpegCommand = ffmpeg(`${filepath}`);
   let resultArray: string[] = [];
   ffmpegCommand
@@ -32,8 +32,10 @@ const ffmpegScreenshotPromise = (
     .on('error', () => {
       throw new Error('FFmpeg error.');
     })
-    .on('filenames', (arr) => {
-      resultArray = arr;
+    .on('filenames', array => {
+      if (Array.isArray(array) && array.every(item => isNonEmptyString(item))) {
+        resultArray = array;
+      }
     });
 });
 /**
@@ -42,18 +44,18 @@ const ffmpegScreenshotPromise = (
  * @param thumbnailFormat Thumbnail format
  * @param width Thumbnail width
  * @param height Thumbnail height
- * @return a promise with the thumbnail buffer
+ * @returns a promise with the thumbnail buffer
  * @throws If called on video file with no ffmpeg available
  */
 export const getThumbnail = async (
   filename: string,
   thumbnailFormat: string,
   fullsAsThumbs: boolean,
-  width: number = 210,
-  height: number = 160,
-): Promise<Buffer> => {
+  width = 210,
+  height = 160,
+): Promise<Uint8Array> => {
   const image = await getImage(filename);
-  let { imagebuffer } = image;
+  let {imagebuffer} = image;
   logger.verbose('Thumbnail cache miss.');
   // Take a screenshot from videos
   if (image.filetype.startsWith('video')) {
@@ -62,7 +64,8 @@ export const getThumbnail = async (
         'Attempted to create thumbnail for video without ffmpeg installed.',
       );
     }
-    const tmpDir = tmp.dirSync();
+
+    const tmpDir = tmp.dirSync(); // eslint-disable-line unicorn/prevent-abbreviations
     try {
       await ffmpegScreenshotPromise(
         path.join(IMAGE_DIR, filename),
@@ -70,32 +73,42 @@ export const getThumbnail = async (
       );
       imagebuffer = await fs.readFile(`${tmpDir.name}/temp.png`);
       await fs.unlink(`${tmpDir.name}/temp.png`);
-    } catch (e: any) {
-      logger.error(`${e.name}:${e.message}`);
+    } catch (error: any) {
+      logger.error(`${error.name}:${error.message}`);
     }
+
     tmpDir.removeCallback();
   }
+
   if (fullsAsThumbs) {
     return imagebuffer;
   }
+
   // Convert the buffer into requested format
   switch (thumbnailFormat) {
-    case 'jpeg':
+    case 'jpeg': {
       return sharp(imagebuffer)
-        .resize(width, height, { fit: 'outside' })
-        .jpeg({ quality: 60 })
+        .resize(width, height, {fit: 'outside'})
+        .jpeg({quality: 60})
         .toBuffer();
-    case 'webp':
+    }
+
+    case 'webp': {
       return sharp(imagebuffer)
-        .resize(width, height, { fit: 'outside' })
+        .resize(width, height, {fit: 'outside'})
         .webp()
         .toBuffer();
-    case 'avif':
+    }
+
+    case 'avif': {
       return sharp(imagebuffer)
-        .resize(width, height, { fit: 'outside' })
+        .resize(width, height, {fit: 'outside'})
         .avif()
         .toBuffer();
-    default:
+    }
+
+    default: {
       throw new Error(`Unknown filetype ${thumbnailFormat}.`);
+    }
   }
 };

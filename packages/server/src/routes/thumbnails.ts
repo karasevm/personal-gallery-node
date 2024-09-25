@@ -1,61 +1,80 @@
-import { Router } from 'express';
-import fileType from 'file-type';
-import logger from '../utils/logger';
-import { imageExists } from '../services/imageService';
-import thumbnailCache from '../utils/cache';
-import { getThumbnail } from '../services/thumbnailService';
-import { FULLS_AS_THUMBS } from '../utils/config';
+import {Router} from 'express';
+import {fileTypeFromBuffer} from 'file-type';
+import logger from '../utils/logger.js';
+import {imageExists} from '../services/imageService.js';
+import thumbnailCache from '../utils/cache.js';
+import {getThumbnail} from '../services/thumbnailService.js';
+import {FULLS_AS_THUMBS} from '../utils/config.js';
 
 const thumbnailsRouter = Router();
 
-thumbnailsRouter.get('/:image/:type', async (req, res) => {
+thumbnailsRouter.get('/:image/:type', async (request, response) => {
   try {
-    if (!imageExists(req.params.image)) {
+    if (!(await imageExists(request.params.image))) {
       throw new Error('Not found.');
     }
-    let result:any;
-    // dont cache thumbs if using fulls
+
+    let result: Uint8Array;
+    // Dont cache thumbs if using fulls
     if (FULLS_AS_THUMBS) {
-      result = await getThumbnail(req.params.image, req.params.type, true);
+      result = await getThumbnail(
+        request.params.image,
+        request.params.type,
+        true,
+      );
     } else {
       result = (await thumbnailCache.wrap(
-        `${req.params.image}${req.params.type}`,
-        () => getThumbnail(req.params.image, req.params.type, false),
-      )) as any;
+        `${request.params.image}${request.params.type}`,
+        async () =>
+          getThumbnail(request.params.image, request.params.type, false),
+      ));
     }
-    // cache-manager returns different types based on the backend,
+
+    response.set('Cache-Control', 'private, max-age=2592000');
+    const imageType = await fileTypeFromBuffer(result);
+    if (imageType === undefined) {
+      throw new Error('file-type error');
+    }
+
+    const {mime} = imageType;
+    response.type(mime);
+    response.end(result, 'binary');
+
+    // Cache-manager returns different types based on the backend,
     // so we manually check how we should treat the result
-    if (result instanceof Buffer) {
-      res.set('Cache-Control', 'private, max-age=2592000');
-      const imageType = await fileType.fromBuffer(result);
-      if (imageType === undefined) {
-        throw new Error('file-type error');
-      }
-      const { mime } = imageType;
-      res.type(mime);
-      res.end(result, 'binary');
-    } else if (result?.type === 'Buffer') {
-      // hack for handling object returned from redis
-      res.set('Cache-Control', 'private, max-age=2592000');
-      const data = Buffer.from(result.data);
-      const imageType = await fileType.fromBuffer(data);
-      if (imageType === undefined) {
-        throw new Error('file-type error');
-      }
-      const { mime } = imageType;
-      res.type(mime);
-      res.end(data, 'binary');
-    } else {
-      throw new Error('Unknow object type');
-    }
-  } catch (err) {
-    logger.error(err);
-    res.status(404).json({ error: 'Not found.' });
+    // if (result instanceof Buffer) {
+    //   response.set('Cache-Control', 'private, max-age=2592000');
+    //   const imageType = await fileTypeFromBuffer(result);
+    //   if (imageType === undefined) {
+    //     throw new Error('file-type error');
+    //   }
+
+    //   const {mime} = imageType;
+    //   response.type(mime);
+    //   response.end(result, 'binary');
+    // } else if (result?.type === 'Buffer') {
+    //   // Hack for handling object returned from redis
+    //   response.set('Cache-Control', 'private, max-age=2592000');
+    //   const data = Buffer.from(result.data);
+    //   const imageType = await fileTypeFromBuffer(data);
+    //   if (imageType === undefined) {
+    //     throw new Error('file-type error');
+    //   }
+
+    //   const {mime} = imageType;
+    //   response.type(mime);
+    //   response.end(data, 'binary');
+    // } else {
+    //   throw new Error('Unknow object type');
+    // }
+  } catch (error) {
+    logger.error(error);
+    response.status(404).json({error: 'Not found.'});
   }
 });
 
-thumbnailsRouter.get('/', async (req, res) => {
-  res.status(400).json({ error: 'No file specified.' });
+thumbnailsRouter.get('/', async (_, response) => {
+  response.status(400).json({error: 'No file specified.'});
 });
 
 export default thumbnailsRouter;
