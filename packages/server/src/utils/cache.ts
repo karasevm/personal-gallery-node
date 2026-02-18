@@ -5,12 +5,15 @@ import {Redis} from 'ioredis';
 import KeyvRedis from '@keyv/redis';
 import {KeyvSqlite} from '@keyv/sqlite';
 import {
-  REDIS_HOST, REDIS_PORT, REDIS_USERNAME, REDIS_PASSWORD, CACHE_DIR,
+  REDIS_HOST,
+  REDIS_PORT,
+  REDIS_USERNAME,
+  REDIS_PASSWORD,
+  CACHE_DIR,
 } from './config.js';
 import logger from './logger.js';
 
-// eslint-disable-next-line import/no-mutable-exports
-let thumbnailCache: ReturnType<typeof createCache>;
+let thumbnailCache: ReturnType<typeof createCache>; // eslint-disable-line import-x/no-mutable-exports
 
 if (REDIS_HOST !== undefined) {
   // Define redis cache

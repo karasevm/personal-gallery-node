@@ -4,16 +4,15 @@
   "version": "1.3.1",
   "description": "",
   "scripts": {
-    "server-dev": "yarn workspace server dev",
-    "web-dev": "yarn workspace web start",
+    "server-dev": "bun --filter server dev",
+    "web-dev": "bun --filter web start",
     "start-dev": "run-p server-dev web-dev",
-    "web-build": "yarn workspace web build",
-    "copy": "yarn copyfiles -u 3 \"packages/web/build/*\" \"packages/web/build/**/*\" packages/server/public",
-    "build": "yarn web-build && yarn workspace server build && yarn copy",
-    "build-dev": "NODE_ENV=development yarn web-build && yarn workspace server build && yarn copy",
-    "start": "yarn workspace server start",
-    "test": "yarn workspace server test",
-    "lint": "yarn workspace server lint && yarn workspace web lint"
+    "web-build": "bun --filter web build",
+    "copy": "bun copyfiles -u 3 \"packages/web/build/*\" \"packages/web/build/**/*\" packages/server/public",
+    "build": "bun web-build && bun --filter server build && bun copy",
+    "build-dev": "NODE_ENV=development bun web-build && bun --filter server build && bun copy",
+    "start": "bun --filter server start",
+    "lint": "bun --filter server lint && bun --filter web lint"
   },
   "author": {
     "name": "Maksim Karasev"
@@ -29,9 +28,25 @@
   "installConfig": {
     "hoistingLimits": "dependencies"
   },
+  "overrides": {
+    "@types/express": "^5.0.6"
+  },
   "devDependencies": {
     "copyfiles": "^2.4.1",
     "npm-run-all": "^4.1.5"
   },
-  "packageManager": "yarn@4.5.0"
+  "xo": {
+    "space": true,
+    "rules": {
+      "new-cap": [
+        "off"
+      ],
+      "unicorn/filename-case": [
+        "error",
+        {
+          "case": "camelCase"
+        }
+      ]
+    }
+  }
 }

@@ -7,20 +7,21 @@
 /* eslint-disable max-nested-callbacks */
 /* eslint-disable arrow-body-style */
 import fs from 'node:fs';
-import process from 'node:process';
-import path, {dirname} from 'node:path';
-import {fileURLToPath} from 'node:url';
-import {agent} from 'supertest';
-import {fileTypeFromBuffer} from 'file-type';
+import path, { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { agent } from 'supertest';
+import { test, expect, describe, beforeAll } from 'bun:test';
+import { fileTypeFromBuffer } from 'file-type';
 import app from '../src/app.js';
-import {register} from '../src/services/authService.js';
+import { register } from '../src/services/authService.js';
 import * as database from '../src/utils/db.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const testDir = path.resolve(import.meta.path, '../');
 const API_URL = '/api';
 
 const clearTempDir = () => {
-  const directory = path.join(process.cwd(), 'test', 'i');
+  const directory = path.join(testDir, 'i');
   const files = fs.readdirSync(directory);
   for (const file of files) {
     if (!file.startsWith('.')) {
@@ -30,9 +31,9 @@ const clearTempDir = () => {
 };
 
 const getFileFromTempDir = (fullPath = false) => {
-  const directory = path.join(process.cwd(), 'test', 'i');
-  const files = fs.readdirSync(directory);
-  return fullPath ? path.join(directory, files[1]) : files[1];
+  const directory = path.join(testDir, 'i');
+  const file_ = fs.readdirSync(directory).find(file => !file.startsWith('.'));
+  return fullPath ? path.join(directory, file_) : file_;
 };
 
 beforeAll(done => {
@@ -48,41 +49,42 @@ describe('Logged in', () => {
     await register('testing', 'testing');
     await api
       .post(`${API_URL}/login`)
-      .send({username: 'testing', password: 'testing'});
+      .send({ username: 'testing', password: 'testing' });
   });
   describe('Images', () => {
-    describe('Upload', () => {
-      test('200 valid image', async () => {
+    describe.serial('Upload', () => {
+      test.serial('200 valid image', async () => {
         return api
           .post(`${API_URL}/images`)
           .attach('file', `${__dirname}/good.jpg`)
           .expect(200);
       });
-      test('400 invalid image', async () => {
+      test.serial('400 invalid image', async () => {
         return api
           .post(`${API_URL}/images`)
           .attach('file', `${__dirname}/bad.jpg`)
           .expect(400);
       });
-      test('400 non image', async () => {
+      test.serial('400 non image', async () => {
         return api
           .post(`${API_URL}/images`)
           .attach('file', `${__dirname}/test.txt`)
           .expect(400);
       });
-      test('400 image with .txt extension', async () => {
+      test.serial('400 image with .txt extension', async () => {
         return api
           .post(`${API_URL}/images`)
           .attach('file', `${__dirname}/good.txt`)
           .expect(400);
       });
     });
-    describe('Get', () => {
+    describe.serial('Get', () => {
       test('Image list', async () => {
         return api
           .get(`${API_URL}/images`)
           .expect(200)
           .then(response => {
+            console.log(response.body);
             expect(response.body.length).toBe(1);
           });
       });
@@ -92,17 +94,17 @@ describe('Logged in', () => {
           .expect(200)
           .then(async response => {
             expect((await fileTypeFromBuffer(response.body))?.mime).toBe(
-              'image/jpeg',
+              'image/jpeg'
             );
           });
       });
       test('200 specific image thumbnail', async () => {
         return api
-          .get(`${API_URL}/thumbnails/${`/${getFileFromTempDir()}`}/webp`)
+          .get(`${API_URL}/thumbnails/${getFileFromTempDir()}/webp`)
           .expect(200)
           .then(async response => {
             expect((await fileTypeFromBuffer(response.body))?.mime).toBe(
-              'image/webp',
+              'image/webp'
             );
           });
       });
@@ -149,7 +151,7 @@ describe('Not logged in', () => {
           .expect(200)
           .then(async response => {
             expect((await fileTypeFromBuffer(response.body))?.mime).toBe(
-              'image/jpeg',
+              'image/jpeg'
             );
           });
       });

@@ -2,14 +2,15 @@ import {type Stats, promises as fs} from 'node:fs';
 import path from 'node:path';
 import {fileTypeFromBuffer, fileTypeFromFile} from 'file-type';
 import sanitize from 'sanitize-filename';
-import {customAlphabet} from 'nanoid/async';
+import {customAlphabet} from 'nanoid';
 import {getImagesFromDB, insertImageIntoDB} from '../utils/db.js';
 import logger from '../utils/logger.js';
 import {IMAGE_DIR} from '../utils/config.js';
 import {type Image, SortBy, SortOrder} from '../types.js';
 import {ACCEPTED_MIME} from '../utils/consts.js';
 
-const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const alphabet
+  = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 const nanoid = customAlphabet(alphabet, 7);
 
 /**
@@ -18,11 +19,10 @@ const nanoid = customAlphabet(alphabet, 7);
 export const registerFileInFolder = async () => {
   try {
     const files = await fs.readdir(IMAGE_DIR);
-    const filesWithStats = await Promise.all(
-      files.map(async filename => fs
+    const filesWithStats = await Promise.all(files.map(async filename =>
+      fs
         .stat(path.join(IMAGE_DIR, filename))
-        .then(stat => ({filename, stat}))),
-    );
+        .then(stat => ({filename, stat}))));
 
     const filteredFilesWithStats: Array<{
       filename: string;
@@ -30,9 +30,7 @@ export const registerFileInFolder = async () => {
     }> = [];
 
     const filePromises = filesWithStats.map(async file => {
-      const result = await fileTypeFromFile(
-        path.join(IMAGE_DIR, file.filename),
-      );
+      const result = await fileTypeFromFile(path.join(IMAGE_DIR, file.filename));
       if (result !== undefined && ACCEPTED_MIME.includes(result.mime)) {
         filteredFilesWithStats.push(file);
       }
@@ -48,9 +46,7 @@ export const registerFileInFolder = async () => {
       }
     }
 
-    logger.info(
-      `Found ${filesWithStats.length} files, ${filteredFilesWithStats.length} valid images, ${newCount} new`,
-    );
+    logger.info(`Found ${filesWithStats.length} files, ${filteredFilesWithStats.length} valid images, ${newCount} new`);
   } catch (error: any) {
     logger.error(`Error while registering files ${error.message}`);
   }
@@ -88,9 +84,8 @@ export const getImages = async (
   count = 10,
   sortOrder: SortOrder = SortOrder.Descending,
   page?: number,
-): Promise<string[]> => getImagesFromDB(sortBy, sortOrder, count, page).map(
-  entry => entry.filename,
-);
+): Promise<string[]> =>
+  getImagesFromDB(sortBy, sortOrder, count, page).map(entry => entry.filename);
 
 /**
  * Get an image from the disk
@@ -122,9 +117,12 @@ export const getImage = async (filename: string): Promise<Image> => {
  */
 export const imageExists = async (filename: string): Promise<boolean> => {
   try {
-    if (await fs.access(path.join(IMAGE_DIR, sanitize(filename)), fs.constants.F_OK)
-      .then(() => true)
-      .catch(() => false)) {
+    if (
+      await fs
+        .access(path.join(IMAGE_DIR, sanitize(filename)), fs.constants.F_OK)
+        .then(() => true)
+        .catch(() => false)
+    ) {
       return true;
     }
 

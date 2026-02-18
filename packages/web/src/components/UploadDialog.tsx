@@ -1,16 +1,16 @@
-
 /** @jsxImportSource @emotion/react */
 import React from 'react';
-import {
-  Dialog, DialogTitle, IconButton, type Theme,
-} from '@mui/material';
-import {css} from '@emotion/react';
-import {useDropzone} from 'react-dropzone';
-import {useTranslation} from 'react-i18next';
-import {useTheme} from '@mui/styles';
+import { Dialog, DialogTitle, IconButton, type Theme } from '@mui/material';
+import { css } from '@emotion/react';
+import { Accept, useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material/styles';
 
 function UploadDialog({
-  isOpen, onClose, onDrop, accept,
+  isOpen,
+  onClose,
+  onDrop,
+  accept
 }: {
   readonly isOpen: boolean;
   readonly onClose: () => void;
@@ -30,55 +30,59 @@ function UploadDialog({
       marginRight: '20px',
       height: '20vh',
       minWidth: '40vw',
-      transition: 'border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+      transition: 'border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1)'
     }),
     icon: css({
-      fontSize: '2rem',
+      fontSize: '2rem'
     }),
     accept: css({
-      borderColor: 'green !important',
+      borderColor: 'green !important'
     }),
     reject: css({
-      borderColor: 'red !important',
+      borderColor: 'red !important'
     }),
     closeButton: css({
       position: 'absolute',
       right: theme.spacing(1),
       top: theme.spacing(1),
-      color: theme.palette.grey[500],
-    }),
+      color: theme.palette.grey[500]
+    })
   };
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
+  const acceptObj: Accept = accept.reduce<Accept>(
+    (acc, curr) => ((acc[curr] = []), acc),
+    {}
+  );
   const {
     getRootProps,
     getInputProps,
     isDragActive,
     isDragAccept,
-    isDragReject,
+    isDragReject
   } = useDropzone({
     onDropAccepted(acceptedFiles) {
       onDrop(acceptedFiles);
     },
-    accept,
+    accept: acceptObj
   });
   return (
     <Dialog
       open={isOpen}
-      aria-describedby='alert-dialog-description'
-      maxWidth='xl'
-      aria-labelledby='alert-dialog-title'
+      aria-describedby="alert-dialog-description"
+      maxWidth="xl"
+      aria-labelledby="alert-dialog-title"
       onClose={onClose}
     >
-      <DialogTitle id='alert-dialog-title'>
+      <DialogTitle id="alert-dialog-title">
         {t('Upload')}
         <IconButton
-          aria-label='close'
+          aria-label="close"
           css={styles.closeButton}
-          size='large'
+          size="large"
           onClick={onClose}
         >
-          <span className='material-icons'>close</span>
+          <span className="material-icons">close</span>
         </IconButton>
       </DialogTitle>
       <section>
@@ -87,12 +91,12 @@ function UploadDialog({
             css: [
               styles.dropzone,
               isDragAccept ? styles.accept : null,
-              isDragReject ? styles.reject : null,
+              isDragReject ? styles.reject : null
             ],
-            className: 'dropzone ',
+            className: 'dropzone '
           })}
         >
-          <input {...getInputProps()}/>
+          <input {...getInputProps()} />
           <span css={styles.icon}>
             {isDragActive ? null : '📁'}
             {isDragAccept ? '📂' : null}

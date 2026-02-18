@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import {css} from '@emotion/react';
+import { css } from '@emotion/react';
 import {
   AppBar,
   Button,
@@ -7,47 +7,49 @@ import {
   TextField,
   type Theme,
   Toolbar,
-  Typography,
+  Typography
 } from '@mui/material';
-import React, {useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {useTheme} from '@mui/styles';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material/styles';
 
-function LoginView({onLogin, isSetupFinished: setupFinished}:
-{
+function LoginView({
+  onLogin,
+  isSetupFinished: setupFinished
+}: {
   readonly onLogin: (username: string, password: string) => void;
   readonly isSetupFinished: boolean;
 }) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const theme: Theme = useTheme();
   const styles = {
     margin: css({
-      margin: theme.spacing(1),
+      margin: theme.spacing(1)
     }),
     header: css({
       textAlign: 'center',
-      fontWeight: 300,
-    }),
+      fontWeight: 300
+    })
   };
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   return (
-    <div className='App'>
-      <AppBar position='static'>
+    <div className="App">
+      <AppBar position="static">
         <Toolbar>
-          <Typography variant='h6'>{t('Pictures')}</Typography>
+          <Typography variant="h6">{t('Pictures')}</Typography>
         </Toolbar>
       </AppBar>
       <Grid
         container
         spacing={0}
-        alignItems='center'
-        justifyContent='center'
-        style={{minHeight: '80vh'}}
+        alignItems="center"
+        justifyContent="center"
+        style={{ minHeight: '80vh' }}
       >
-        <Grid item xs={8} md={6}>
-          <Typography variant='h3' css={styles.header}>
+        <Grid size={{ xs: 8, md: 6 }}>
+          <Typography variant="h3" css={styles.header}>
             {setupFinished ? t('Login') : t('Register')}
           </Typography>
           <form
@@ -58,11 +60,11 @@ function LoginView({onLogin, isSetupFinished: setupFinished}:
           >
             <TextField
               fullWidth
-              id='outlined-username-input'
+              id="outlined-username-input"
               label={t('Username')}
-              type='text'
+              type="text"
               autoComplete={setupFinished ? 'current-username' : 'new-username'}
-              variant='outlined'
+              variant="outlined"
               value={username}
               css={styles.margin}
               onChange={event => {
@@ -71,11 +73,11 @@ function LoginView({onLogin, isSetupFinished: setupFinished}:
             />
             <TextField
               fullWidth
-              id='outlined-password-input'
+              id="outlined-password-input"
               label={t('Password')}
-              type='password'
+              type="password"
               autoComplete={setupFinished ? 'current-password' : 'new-password'}
-              variant='outlined'
+              variant="outlined"
               value={password}
               css={styles.margin}
               onChange={event => {
@@ -84,9 +86,9 @@ function LoginView({onLogin, isSetupFinished: setupFinished}:
             />
             <Button
               fullWidth
-              variant='contained'
-              color='primary'
-              type='submit'
+              variant="contained"
+              color="primary"
+              type="submit"
               css={styles.margin}
             >
               {setupFinished ? t('Login') : t('Register')}

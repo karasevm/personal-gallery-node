@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Container,
   type Theme,
@@ -10,14 +10,13 @@ import {
   Grid,
   Typography,
   type Breakpoint,
-  useMediaQuery,
-  Grid2,
+  useMediaQuery
 } from '@mui/material';
-import {css} from '@emotion/react';
+import { css } from '@emotion/react';
 import InfiniteScroll from 'react-infinite-scroller';
-import axios, {isAxiosError} from 'axios';
-import {useTranslation} from 'react-i18next';
-import {useTheme} from '@mui/styles';
+import axios, { isAxiosError } from 'axios';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material/styles';
 import createBreakpoint from 'react-use/lib/factory/createBreakpoint';
 import * as imageService from './services/images';
 import * as settingsService from './services/settings';
@@ -25,9 +24,7 @@ import * as loginService from './services/login';
 import * as metaService from './services/meta';
 import * as userService from './services/user';
 import ImageGridListTile from './components/ImageGridList';
-import {
-  type Config, type Image, type SortBy, type SortOrder,
-} from './types';
+import { type Config, type Image, type SortBy, type SortOrder } from './types';
 import PicturesAppBar from './components/PicturesAppBar';
 import UploadDialog from './components/UploadDialog';
 import ConfigurationDialog from './components/ConfiguarionDialog';
@@ -39,7 +36,7 @@ const useBreakpoint = createBreakpoint({
   6: 1200,
   5: 900,
   4: 600,
-  3: 0,
+  3: 0
 });
 
 function App() {
@@ -49,17 +46,16 @@ function App() {
   const imagesPage = useRef(0);
   const [hasMore, setHasMore] = useState(true);
   const [userSettings, setUserSettings] = useState<Config | undefined>(
-    undefined,
+    undefined
   );
   const [dragOpen, setDragOpen] = useState(false);
   const [configurationDialogOpen, setConfigurationDialogOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [credentialChangeDialogOpen, setCredentialChangeDialogOpen] = useState(
-    false,
-  );
+  const [credentialChangeDialogOpen, setCredentialChangeDialogOpen] =
+    useState(false);
   const [notification, setNotification] = useState('');
   const [userLoggedIn, setUserLoggedIn] = useState<boolean | undefined>(
-    undefined,
+    undefined
   );
   const [acceptedUploadFiletypes, setAcceptedUploadFiletypes] = useState([
     'image/webp',
@@ -67,7 +63,7 @@ function App() {
     'image/gif',
     'image/png',
     'image/jpeg',
-    'image/bmp',
+    'image/bmp'
   ]);
   const [setupFinished, setSetupFinished] = useState(true);
   const [apiKey, setApiKey] = useState<string | undefined>();
@@ -75,74 +71,81 @@ function App() {
   const theme: Theme = useTheme();
   const styles = {
     root: css({
-      height: '100vh',
+      height: '100vh'
     }),
     titleBar: css({
       background:
-          'linear-gradient(to bottom, rgba(0,0,0,0) 0%, '
-          + 'rgba(0,0,0,0) 70%, rgba(0,0,0,0) 100%)',
+        'linear-gradient(to bottom, rgba(0,0,0,0) 0%, ' +
+        'rgba(0,0,0,0) 70%, rgba(0,0,0,0) 100%)',
       transition: 'background 2s ease-out',
       '&:hover': {
         background:
-            'linear-gradient(to bottom, rgba(0,0,0,0) 0%, '
-            + 'rgba(0,0,0,0) 70%, rgba(0,0,0,0) 100%)',
-      },
+          'linear-gradient(to bottom, rgba(0,0,0,0) 0%, ' +
+          'rgba(0,0,0,0) 70%, rgba(0,0,0,0) 100%)'
+      }
     }),
     icon: css({
       color: 'white',
-      filter: 'drop-shadow(2px 4px 3px #222222)',
+      filter: 'drop-shadow(2px 4px 3px #222222)'
     }),
     listItem: css({
       cursor: 'pointer',
       '&:hover': {
-        opacity: '0.9',
-      },
+        opacity: '0.9'
+      }
     }),
     dialogImage: css({
-      maxHeight: '80vh',
+      maxHeight: '80vh'
     }),
     loader: css({
-      margin: '1rem',
+      margin: '1rem'
     }),
     toolbarTitle: css({
-      flexGrow: 1,
+      flexGrow: 1
     }),
     toolbarButton: css({
-      flexGrow: 1,
+      flexGrow: 1
     }),
     placeholderText: css({
       textAlign: 'center',
       margin: theme.spacing(1),
-      color: '#696969',
+      color: '#696969'
     }),
     placeholderIconContainer: css({
       textAlign: 'center',
-      color: '#696969',
+      color: '#696969'
     }),
     placeholderIcon: css({
       fontSize: '96px',
-      verticalAlign: '-25%',
-    }),
+      verticalAlign: '-25%'
+    })
   };
   // Const width = useWidth();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const widthMap = {
-    xs: 3, sm: 4, md: 5, lg: 6, xl: 6,
+    xs: 3,
+    sm: 4,
+    md: 5,
+    lg: 6,
+    xl: 6
   };
   // Const cols = widthMap[width];
   const cols = Number(useBreakpoint());
 
   useEffect(() => {
     // ImageService.getAll().then(result => setImagesData(result));
-    metaService.getMeta().then(result => {
-      setAcceptedUploadFiletypes(result.accepted);
-      setSetupFinished(result.setupFinished);
-      setUserSettings(settingsService.getSettings());
-      setUserLoggedIn(settingsService.getUserState());
-    }).catch((error: unknown) => {
-      console.error(error);
-    });
+    metaService
+      .getMeta()
+      .then(result => {
+        setAcceptedUploadFiletypes(result.accepted);
+        setSetupFinished(result.setupFinished);
+        setUserSettings(settingsService.getSettings());
+        setUserLoggedIn(settingsService.getUserState());
+      })
+      .catch((error: unknown) => {
+        console.error(error);
+      });
   }, []);
   const imageTileClickHandler = (url: string) => {
     if (/\.(mp4|webm)$/.test(url)) {
@@ -170,16 +173,12 @@ function App() {
   const onDataNext = () => {
     const page = imagesPage.current;
     imageService
-      .getPage(
-        page,
-        userSettings?.sortBy,
-        userSettings?.sortOrder,
-      )
+      .getPage(page, userSettings?.sortBy, userSettings?.sortOrder)
       .then(result => {
         if (result.length === 0) {
           setHasMore(false);
         } else {
-          setImagesData(data => ({...data, [page]: result}));
+          setImagesData(data => ({ ...data, [page]: result }));
         }
       })
       .catch((error: unknown) => {
@@ -211,14 +210,14 @@ function App() {
       if (combinedResult.length > 0) {
         setImagesData(data => {
           if (data === undefined || Object.keys(data).length === 0) {
-            return {[-1]: combinedResult};
+            return { [-1]: combinedResult };
           }
 
           if (data[-1] === undefined || Object.keys(data[-1]).length === 0) {
-            return {...data, [-1]: [...combinedResult]};
+            return { ...data, [-1]: [...combinedResult] };
           }
 
-          return {...data, [-1]: [...combinedResult, ...data[-1]]};
+          return { ...data, [-1]: [...combinedResult, ...data[-1]] };
         });
       }
     } catch {
@@ -241,9 +240,9 @@ function App() {
   };
 
   const handleSettingsChange = (sortBy: SortBy, sortOrder: SortOrder) => {
-    setUserSettings({...userSettings, sortBy, sortOrder});
+    setUserSettings({ ...userSettings, sortBy, sortOrder });
     setConfigurationDialogOpen(false);
-    settingsService.saveSettings({...userSettings, sortBy, sortOrder});
+    settingsService.saveSettings({ ...userSettings, sortBy, sortOrder });
     setNotification(t('Settings changed'));
     refreshData();
   };
@@ -294,7 +293,7 @@ function App() {
   const handleCredentialsChange = async (
     oldPassword: string,
     username: string,
-    password: string,
+    password: string
   ) => {
     try {
       await userService.updateCredentials(oldPassword, username, password);
@@ -309,9 +308,9 @@ function App() {
 
   if (userSettings === undefined || userLoggedIn === undefined) {
     return (
-      <Grid2 container justifyContent='center'>
-        <CircularProgress css={styles.loader}/>
-      </Grid2>
+      <Grid container justifyContent="center">
+        <CircularProgress css={styles.loader} />
+      </Grid>
     );
   }
 
@@ -339,67 +338,65 @@ function App() {
               loadMore={onDataNext}
               pageStart={-1}
               hasMore={hasMore}
-              loader={(
-                <Grid2 key='loader_grid' container justifyContent='center'>
-                  <CircularProgress css={styles.loader}/>
-                </Grid2>
-              )}
+              loader={
+                <Grid key="loader_grid" container justifyContent="center">
+                  <CircularProgress css={styles.loader} />
+                </Grid>
+              }
             >
-              {typeof imagesData === 'object' && Object.keys(imagesData).length > 0 ? (
+              {typeof imagesData === 'object' &&
+              Object.keys(imagesData).length > 0 ? (
                 <ImageGridListTile
-                // Sort and flatten the pages as we might have received them in any order
-                  images={
-                    [
-                      ...new Set(Object.keys(imagesData)
+                  // Sort and flatten the pages as we might have received them in any order
+                  images={[
+                    ...new Set(
+                      Object.keys(imagesData)
                         .map(Number)
                         .sort((a: number, b: number) => a - b)
-                        .flatMap((k: number) => imagesData[k]),
-                      ),
-                    ]
-                  }
+                        .flatMap((k: number) => imagesData[k])
+                    )
+                  ]}
                   cols={cols}
                   onTileClick={imageTileClickHandler}
                   onNotification={setNotification}
                 />
               ) : (
-                <Grid2 key='empty_grid'>
+                <Grid key="empty_grid">
                   <div css={styles.placeholderIconContainer}>
-                    <span css={styles.placeholderIcon} className='material-icons-outlined'>
+                    <span
+                      css={styles.placeholderIcon}
+                      className="material-icons-outlined"
+                    >
                       insert_photo
                     </span>
                   </div>
                   <Typography css={styles.placeholderText}>
                     {t('Upload your first image')}
                   </Typography>
-                </Grid2>
+                </Grid>
               )}
             </InfiniteScroll>
           </Container>
         </>
       ) : (
-        <LoginView isSetupFinished={setupFinished} onLogin={handleLogin}/>
+        <LoginView isSetupFinished={setupFinished} onLogin={handleLogin} />
       )}
 
       <Dialog
         open={modalImage !== '' || modalVideo !== ''}
-        aria-labelledby='alert-dialog-title'
-        aria-describedby='alert-dialog-description'
-        maxWidth='lg'
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="lg"
         onClose={() => {
           setModalImage('');
           setModalVideo('');
         }}
       >
         {modalImage === '' ? null : (
-          <img css={styles.dialogImage} src={modalImage} alt=''/>
+          <img css={styles.dialogImage} src={modalImage} alt="" />
         )}
         {modalVideo === '' ? null : (
-          <video
-            autoPlay
-            controls
-            css={styles.dialogImage}
-            src={modalVideo}
-          />
+          <video autoPlay controls css={styles.dialogImage} src={modalVideo} />
         )}
       </Dialog>
       <UploadDialog
@@ -450,23 +447,23 @@ function App() {
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'left',
+          horizontal: 'left'
         }}
         open={notification.length > 0}
         autoHideDuration={4000}
         message={notification}
-        action={(
+        action={
           <IconButton
-            size='small'
-            aria-label='close'
-            color='inherit'
+            size="small"
+            aria-label="close"
+            color="inherit"
             onClick={() => {
               setNotification('');
             }}
           >
-            <span className='material-icons'>close</span>
+            <span className="material-icons">close</span>
           </IconButton>
-        )}
+        }
         onClose={() => {
           setNotification('');
         }}
