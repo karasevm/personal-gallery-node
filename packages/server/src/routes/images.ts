@@ -59,6 +59,10 @@ imagesRouter.get('/', async (request, response) => {
       break;
     }
 
+    case undefined: {
+      break;
+    }
+
     default: {
       break;
     }
@@ -73,6 +77,10 @@ imagesRouter.get('/', async (request, response) => {
 
     case 'DESC': {
       sortOrder = SortOrder.Descending;
+      break;
+    }
+
+    case undefined: {
       break;
     }
 
@@ -93,11 +101,7 @@ imagesRouter.get('/', async (request, response) => {
   logger.verbose(`Requested images. Sort by:${sortBy}. Sort order:${sortOrder}`);
   response.set('Cache-Control', 'no-store, max-age=0');
   const images = await getImages(sortBy, 10, sortOrder, page);
-  response.json(
-    images.map(
-      value => new FrontEndImage(request, value),
-    ),
-  );
+  response.json(images.map(value => new FrontEndImage(request, value)));
 });
 
 // Image upload

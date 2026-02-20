@@ -26,13 +26,13 @@ describe('Login API', () => {
     test('400 on registering with empty username', async () => {
       return api
         .post(`${API_URL}/login/register`)
-        .send({ username: '', password: 'test' })
+        .send({username: '', password: 'test'})
         .expect(400);
     });
     test('200 on registering with good credentials', async () => {
       return api
         .post(`${API_URL}/login/register`)
-        .send({ username: 'test', password: 'test' })
+        .send({username: 'test', password: 'test'})
         .expect(200)
         .then(() => {
           expect(database.getMeta('username')).toBe('test');
@@ -41,7 +41,7 @@ describe('Login API', () => {
     test('403 on trying to register second time with good credentials', async () => {
       return api
         .post(`${API_URL}/login/register`)
-        .send({ username: 'test', password: 'test' })
+        .send({username: 'test', password: 'test'})
         .expect(403)
         .then(() => {
           expect(database.getMeta('username')).toBe('test');
@@ -53,25 +53,25 @@ describe('Login API', () => {
     test('401 on login with incorrect username', async () => {
       return api
         .post(`${API_URL}/login`)
-        .send({ username: 'wrong', password: 'test' })
+        .send({username: 'wrong', password: 'test'})
         .expect(401);
     });
     test('401 on login with incorrect password', async () => {
       return api
         .post(`${API_URL}/login`)
-        .send({ username: 'test', password: 'wrong' })
+        .send({username: 'test', password: 'wrong'})
         .expect(401);
     });
     test('401 on login with incorrect credentials', async () => {
       return api
         .post(`${API_URL}/login`)
-        .send({ username: 'wrong', password: 'wrong' })
+        .send({username: 'wrong', password: 'wrong'})
         .expect(401);
     });
     test('200 on login with correct credentials', async () => {
       return api
         .post(`${API_URL}/login`)
-        .send({ username: 'test', password: 'test' })
+        .send({username: 'test', password: 'test'})
         .expect(200);
     });
   });

@@ -63,7 +63,7 @@ export const addImage = async (
   fileData: Uint8Array,
   extension: string,
 ): Promise<string> => {
-  const newFileName = `${await nanoid()}.${extension}`;
+  const newFileName = `${nanoid()}.${extension}`;
   const newFilePath = path.join(IMAGE_DIR, newFileName);
   logger.verbose(`Saving buffer into ${newFilePath}`);
   await fs.writeFile(newFilePath, fileData);

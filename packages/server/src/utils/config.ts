@@ -9,7 +9,7 @@ dotenv.config();
 export const PORT: number = Number.parseInt(process.env.PORT ?? '3001', 10);
 export const IMAGE_DIR: string
   = process.env.NODE_ENV === 'test'
-    ? path.join(process.cwd(), 'packages', 'server', 'test', 'i')
+    ? path.join(path.resolve(import.meta.path, '../../../'), 'test', 'i')
     : (process.env.IMAGE_DIR ?? path.join(process.cwd(), 'tmp'));
 export const DB_DIR: string
   = process.env.DB_DIR ?? path.join(process.cwd(), 'tmp');

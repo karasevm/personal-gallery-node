@@ -5,18 +5,18 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import fileUpload from 'express-fileupload';
-import { fileTypeFromBuffer } from 'file-type';
+import {fileTypeFromBuffer} from 'file-type';
 import thumbnailsRouter from './routes/thumbnails.js';
 import imagesRouter from './routes/images.js';
 import metaRouter from './routes/meta.js';
 import loginRouter from './routes/login.js';
 import userRouter from './routes/user.js';
-import { getImage, registerFileInFolder } from './services/imageService.js';
-import { requireAuth } from './utils/middlewares.js';
-import { register } from './services/authService.js';
+import {getImage, registerFileInFolder} from './services/imageService.js';
+import {requireAuth} from './utils/middlewares.js';
+import {register} from './services/authService.js';
 import logger from './utils/logger.js';
 import * as config from './utils/config.js';
-import { isNonEmptyString } from './utils/misc.js';
+import {isNonEmptyString} from './utils/misc.js';
 
 const app = express();
 if (process.env.NODE_ENV === 'dev') {
@@ -30,8 +30,8 @@ const rateLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 10,
   handler(_request, response) {
-    response.status(429).json({ status: 'ratelimit' });
-  }
+    response.status(429).json({status: 'ratelimit'});
+  },
 });
 // Const speedLimiter = slowDown({
 //   windowMs: 60 * 1000, // 15 minutes
@@ -41,7 +41,7 @@ const rateLimiter = rateLimit({
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 app.set('trust proxy', config.PROXY);
 
 app.use(express.static('public'));
@@ -60,7 +60,7 @@ app.get('/:id', async (request, response) => {
       return;
     }
 
-    const { mime } = imageType;
+    const {mime} = imageType;
     response.type(mime);
     response.end(buffer, 'binary');
   } catch {

@@ -8,8 +8,8 @@
     "node": ">=18.4"
   },
   "scripts": {
-    "build": "bun build ./src/server.ts --outdir ./dist --target bun",
-    "start": "NODE_ENV=production bun --max-old-space-size=256 server.js",
+    "build": "bun build ./src/server.ts --outdir ./dist --target bun --sourcemap --external sharp",
+    "start": "NODE_ENV=production bun ./dist/server.js",
     "dev": "NODE_ENV=dev bun --watch src/server.ts",
     "lint": "xo"
   },
@@ -48,7 +48,6 @@
     "@keyv/redis": "^5.1.6",
     "@keyv/sqlite": "^4.0.8",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.6.2",
     "cache-manager": "^7.2.8",
     "command-exists": "^1.2.9",
     "cookie-parser": "^1.4.6",

@@ -1,33 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 import path from 'node:path';
 import process from 'node:process';
 import sqlite3 from 'bun:sqlite';
-import { type ImageDatabaseEntry } from '../types.js';
-import { DB_DIR } from './config.js';
+import {type ImageDatabaseEntry} from '../types.js';
+import {DB_DIR} from './config.js';
 import logger from './logger.js';
 
-const dbPath =
-  process.env.NODE_ENV === 'test' ? ':memory:' : path.join(DB_DIR, 'app.db');
+const dbPath
+  = process.env.NODE_ENV === 'test' ? ':memory:' : path.join(DB_DIR, 'app.db');
 logger.debug(`Attempting to store db in ${dbPath}`);
 
 export const database = new sqlite3(dbPath);
 
-process.on('exit', () => database.close());
+process.on('exit', () => {
+  database.close();
+});
 process.on('SIGHUP', () => process.exit(128 + 1));
 process.on('SIGINT', () => process.exit(128 + 2));
 process.on('SIGTERM', () => process.exit(128 + 15));
 
 database
-  .prepare(
-    'CREATE TABLE IF NOT EXISTS images (id INTEGER PRIMARY KEY AUTOINCREMENT, filename TEXT UNIQUE, added INTEGER)'
-  )
+  .prepare('CREATE TABLE IF NOT EXISTS images (id INTEGER PRIMARY KEY AUTOINCREMENT, filename TEXT UNIQUE, added INTEGER)')
   .run();
 database
-  .prepare(
-    'CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, session TEXT)'
-  )
+  .prepare('CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, session TEXT)')
   .run();
 database
   .prepare('CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)')
@@ -41,7 +38,7 @@ database
  */
 export const insertImageIntoDB = (
   filename: string,
-  addedTimestamp: number = Date.now()
+  addedTimestamp: number = Date.now(),
 ) => {
   const result = database
     .prepare('SELECT EXISTS(SELECT filename FROM images WHERE filename=?)')
@@ -50,9 +47,7 @@ export const insertImageIntoDB = (
     throw new Error('file already exists');
   }
 
-  const stmt = database.prepare(
-    'INSERT INTO images (filename,added) VALUES (?,?)'
-  );
+  const stmt = database.prepare('INSERT INTO images (filename,added) VALUES (?,?)');
   stmt.run(filename, addedTimestamp);
 };
 
@@ -68,12 +63,10 @@ export const getImagesFromDB = (
   order: 'added' | 'filename',
   orderDirection: 'ASC' | 'DESC',
   limit = 10,
-  page = 0
+  page = 0,
 ): ImageDatabaseEntry[] => {
   logger.verbose(`${order}, ${orderDirection}, ${limit}, ${page}`);
-  const stmt = database.prepare(
-    `SELECT * FROM images ORDER BY ${order} ${orderDirection} LIMIT ? OFFSET ?`
-  );
+  const stmt = database.prepare(`SELECT * FROM images ORDER BY ${order} ${orderDirection} LIMIT ? OFFSET ?`);
   return stmt.all(limit, page * limit) as ImageDatabaseEntry[];
 };
 
@@ -117,10 +110,10 @@ export const clearSessionsDB = () => {
 };
 
 // Meta - key value store backed by a sqlite table
-interface MetaValue {
+type MetaValue = {
   key: string;
   value: string;
-}
+};
 /**
  * Sets a meta value
  */
@@ -138,7 +131,7 @@ export const getMeta = (key: string) =>
   (
     database
       .prepare('SELECT value FROM meta WHERE key = ?')
-      .get(key) as MetaValue | null
+      .get(key) as MetaValue | undefined
   )?.value;
 
 /**

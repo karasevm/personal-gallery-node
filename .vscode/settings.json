@@ -3,5 +3,6 @@
   // "eslint.workingDirectories": ["./packages/web", "./packages/server"],
   "editor.codeActionsOnSave": {
     "source.fixAll": "always"
-  }
+  },
+  "prettier.enable": false
 }

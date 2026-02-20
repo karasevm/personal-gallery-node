@@ -7,13 +7,15 @@
 /* eslint-disable max-nested-callbacks */
 /* eslint-disable arrow-body-style */
 import fs from 'node:fs';
-import path, { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { agent } from 'supertest';
-import { test, expect, describe, beforeAll } from 'bun:test';
-import { fileTypeFromBuffer } from 'file-type';
+import path, {dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {agent} from 'supertest';
+import {
+  test, expect, describe, beforeAll,
+} from 'bun:test';
+import {fileTypeFromBuffer} from 'file-type';
 import app from '../src/app.js';
-import { register } from '../src/services/authService.js';
+import {register} from '../src/services/authService.js';
 import * as database from '../src/utils/db.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -32,7 +34,7 @@ const clearTempDir = () => {
 
 const getFileFromTempDir = (fullPath = false) => {
   const directory = path.join(testDir, 'i');
-  const file_ = fs.readdirSync(directory).find(file => !file.startsWith('.'));
+  const file_ = fs.readdirSync(directory).find(file => !file.startsWith('.')) ?? '';
   return fullPath ? path.join(directory, file_) : file_;
 };
 
@@ -49,7 +51,7 @@ describe('Logged in', () => {
     await register('testing', 'testing');
     await api
       .post(`${API_URL}/login`)
-      .send({ username: 'testing', password: 'testing' });
+      .send({username: 'testing', password: 'testing'});
   });
   describe('Images', () => {
     describe.serial('Upload', () => {
@@ -93,9 +95,7 @@ describe('Logged in', () => {
           .get(`/${getFileFromTempDir()}`)
           .expect(200)
           .then(async response => {
-            expect((await fileTypeFromBuffer(response.body))?.mime).toBe(
-              'image/jpeg'
-            );
+            expect((await fileTypeFromBuffer(response.body))?.mime).toBe('image/jpeg');
           });
       });
       test('200 specific image thumbnail', async () => {
@@ -103,9 +103,7 @@ describe('Logged in', () => {
           .get(`${API_URL}/thumbnails/${getFileFromTempDir()}/webp`)
           .expect(200)
           .then(async response => {
-            expect((await fileTypeFromBuffer(response.body))?.mime).toBe(
-              'image/webp'
-            );
+            expect((await fileTypeFromBuffer(response.body))?.mime).toBe('image/webp');
           });
       });
     });
@@ -150,9 +148,7 @@ describe('Not logged in', () => {
           .get(`/${getFileFromTempDir()}`)
           .expect(200)
           .then(async response => {
-            expect((await fileTypeFromBuffer(response.body))?.mime).toBe(
-              'image/jpeg'
-            );
+            expect((await fileTypeFromBuffer(response.body))?.mime).toBe('image/jpeg');
           });
       });
       test('401 Specific image thumbnail', async () => {

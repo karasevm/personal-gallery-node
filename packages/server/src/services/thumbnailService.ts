@@ -60,9 +60,7 @@ export const getThumbnail = async (
   // Take a screenshot from videos
   if (image.filetype.startsWith('video')) {
     if (!FFMPEG_EXISTS) {
-      throw new Error(
-        'Attempted to create thumbnail for video without ffmpeg installed.',
-      );
+      throw new Error('Attempted to create thumbnail for video without ffmpeg installed.');
     }
 
     const tmpDir = tmp.dirSync(); // eslint-disable-line unicorn/prevent-abbreviations
