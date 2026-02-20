@@ -1,4 +1,5 @@
 FROM oven/bun:1 AS base 
+LABEL org.opencontainers.image.source="https://github.com/karasevm/personal-gallery-node"
 
 WORKDIR /app
 
