@@ -1,4 +1,5 @@
 import process from 'node:process';
+import path from 'node:path';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -44,7 +45,9 @@ app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 app.set('trust proxy', config.PROXY);
 
-app.use(express.static('public'));
+const pubDir = path.resolve(import.meta.path, '../../public');
+
+app.use(express.static(pubDir));
 app.use('/api/images', requireAuth, fileUpload(), imagesRouter);
 app.use('/api/thumbnails', requireAuth, thumbnailsRouter);
 app.use('/api/meta', metaRouter);
