@@ -1,15 +1,14 @@
-FROM node:lts-bullseye-slim AS frontend-build
+FROM oven/bun:1 AS base 
 
 WORKDIR /app
 
+FROM base AS frontend-build
 COPY ./ /app
 
-RUN  yarn workspaces focus web \
-  && yarn workspace web build
+RUN bun install --filter web --frozen-lockfile
+RUN bun web-build
 
-FROM node:lts-bullseye-slim
-
-WORKDIR /app
+FROM base
 
 COPY ./ /app
 
@@ -17,19 +16,15 @@ COPY --from=frontend-build /app/packages/web/build /app/packages/server/public
 RUN apt-get update && \
   apt-get install -y \
   ffmpeg \
-  python3 \
-  libjemalloc-dev \
-  build-essential \
-  && yarn --version\
-  && yarn workspaces focus server\
-  && yarn workspace server build \
-  && yarn cache clean --all \
-  && rm -rf /var/lib/apt/lists/* \
-  && find /usr/ -name "*jemalloc.so" > /etc/ld.so.preload 
+  && apt-get clean \
+  bun --version\
+  && bun install --frozen-lockfile --omit=dev --filter server\
+  && bun --filter server build \
+  && rm -rf /var/lib/apt/lists/* 
 
-VOLUME ["/images", "/db"]
+VOLUME ["/images", "/db", "/cache"]
 ENV IMAGE_DIR="/images"
 ENV DB_DIR="/db"
 ENV PORT=80
 
-ENTRYPOINT [ "yarn", "start" ]
+ENTRYPOINT [ "bun", "start" ]
