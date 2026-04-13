@@ -2,6 +2,10 @@ name: Docker CI
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
   release:
     types: [published]
 
@@ -38,10 +42,10 @@ jobs:
           push: true
           platforms: linux/amd64, linux/arm64
           tags: |
-            karasevm/personal-gallery-node:latest, 
-            karasevm/personal-gallery-node:${{ github.event.release.tag_name }},
-            ghcr.io/karasevm/personal-gallery-node:latest, 
-            ghcr.io/karasevm/personal-gallery-node:${{ github.event.release.tag_name }}
+            karasevm/personal-gallery-node:latest,
+            karasevm/personal-gallery-node:${{ github.event.release.tag_name || inputs.version }},
+            ghcr.io/karasevm/personal-gallery-node:latest,
+            ghcr.io/karasevm/personal-gallery-node:${{ github.event.release.tag_name || inputs.version }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
