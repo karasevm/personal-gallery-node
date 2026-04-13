@@ -44,8 +44,7 @@ function LoginView({
       <Grid
         container
         spacing={0}
-        alignItems="center"
-        justifyContent="center"
+        sx={{alignItems: 'center', justifyContent:'center'}}
         style={{ minHeight: '80vh' }}
       >
         <Grid size={{ xs: 8, md: 6 }}>

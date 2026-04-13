@@ -308,7 +308,7 @@ function App() {
 
   if (userSettings === undefined || userLoggedIn === undefined) {
     return (
-      <Grid container justifyContent="center">
+      <Grid container sx={{justifyContent: 'center'}}>
         <CircularProgress css={styles.loader} />
       </Grid>
     );
@@ -339,7 +339,7 @@ function App() {
               pageStart={-1}
               hasMore={hasMore}
               loader={
-                <Grid key="loader_grid" container justifyContent="center">
+                <Grid key="loader_grid" container sx={{justifyContent: 'center'}}>
                   <CircularProgress css={styles.loader} />
                 </Grid>
               }
